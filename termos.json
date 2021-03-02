@@ -1,0 +1,6 @@
+{
+	"tamanho": ["polegada", "polegadas", "pol", "tamanho da tela", "medida da tela"],
+	"marca": ["marca", "fabricante"],
+	"resolução": ["resolução", "resolução máxima", "monitor", "resolução da tela", "resolução de imagem"],
+	"tipo": ["tipo de tela", "tecnologia da tela", "visor"]
+}
