@@ -1,0 +1,275 @@
+{
+        "amazon.com.br" : {
+                "allow" : [
+                        "/*/dp/",
+                        "/gp/adlp/",
+                        "/gp/aw/kindle/first",
+                        "/gp/aw/mom/signup",
+                        "/gp/aw/ybh",
+                        "/gp/baby-reg",
+                        "/gp/cobrandcard/marketing.html",
+                        "/gp/coins/earn",
+                        "/gp/communication-manager/inbox.html",
+                        "/gp/css/gc/payment/redeem-gc-balance",
+                        "/gp/css/homepage.html",
+                        "/gp/css/order-history",
+                        "/gp/digital/ep-landing-page",
+                        "/gp/digital/fiona/kcp-landing-page",
+                        "/gp/drive/app-download",
+                        "/gp/goldbox",
+                        "/gp/help",
+                        "/gp/history",
+                        "/gp/mom/signup",
+                        "/gp/prime/pipeline/prime_gifting_landing",
+                        "/gp/product/",
+                        "/gp/sign-in.html",
+                        "/gp/tradein/your-account",
+                        "/gp/video/library",
+                        "/gp/video/watchlist",
+                        "/gp/vine/help",
+                        "/help/kindlecloudreader",
+                        "/help/kindlefire",
+                        "/iss/credit/rewardscardmember",
+                        "/iss/credit/storecardmember",
+                        "/kindlefirst",
+                        "/kindlepersonaldocuments",
+                        "/manageyourkindle",
+                        "/mn/dcw/myx.html",
+                        "/mytv",
+                        "/oc/dash-button",
+                        "/returns",
+                        "/robots.txt",
+                        "/s/",
+                        "/s?",
+                        "/*/s/",
+                        "/*/s?",
+                        "/sitemaps",
+                        "/storecard",
+                        "/gp/aw/d/",
+                        "/your-account",
+                        "/your-orders"
+                ],
+                "disallow" : [
+                        "/gp/help/reports/infringement/jquery/handle-notice-submit.html",
+                        "/gp/help/customer/handler/handle-email-submit.html",
+                        "/gp/ask-widget/askWidget",
+                        "/gp/cart ",
+                        "/gp/flex ",
+                        "/gp/product/e-mail-friend ",
+                        "/gp/product/product-availability ",
+                        "/gp/product/rate-this-item",
+                        "/ss/customer-reviews/lighthouse/",
+                        "/hz/leaderboard/top-reviewers/",
+                        "/hz/leaderboard/hall-of-fame/",
+                        "/review/top-reviewers/",
+                        "/review/top-reviewers",
+                        "/review/hall-of-fame",
+                        "/reviews/top-reviewers/",
+                        "/reviews/top-reviewers",
+                        "/reviews/hall-of-fame",
+                        "/hz/help/contact/*/message/$",
+                        "/-/",
+                        "/gp/aw/shoppingAids/",
+                        "/hz/contact-us/ajax/initiate-trusted-contact/"
+                ]
+        },
+        "mercadolivre.com.br" : {
+                "allow" : [
+                ],
+                "disallow" : [
+                        "/HOME/",
+                        "/gz/merch/",
+                        "/gz/menu",
+                        "/gz/webdevice/config",
+                        "/gz/referidos",
+                        "/*www.siteinfo.cf",
+                        "/gz/cart/",
+                        "/gz/checkout/",
+                        "/gz/user-logged",
+                        "/gz/shipping-selector",
+                        "/gz/navigation/searches/last",
+                        "/perfil/vendedor/",
+                        "/perfil/comprador/",
+                        "/perfil/profile/",
+                        "/perfil/jm/profile",
+                        "/perfil/ALEXSETHMS",
+                        "/noindex/",
+                        "/navigation/",
+                        "/*itemid",
+                        "/*/jm/item",
+                        "/recommendations-view",
+                        "/org-img/html/",
+                        "/registration?confirmation_url*"
+                ]
+        },
+        "casasbahia.com.br" : {
+                "allow" : [
+                
+                ],
+                "disallow" : [
+                        "/site/",
+                        "/Site/",
+                        "/redirect/",
+                        "*strbusca=",
+                        "*strBusca=",
+                        "*ordenacao=",
+                        "*Ordenacao="
+                ]
+        },
+        "americanas.com.br" : {
+                "allow" : [
+                
+                ],
+                "disallow" : [
+                        "/avaliacao",
+                        "/parceiros",
+                        "/product-description",
+                        "/portal",
+                        "/garantia",
+                        "/estaticapop",
+                        "/search",
+                        "/incluir_prime",
+                        "/*cage.html",
+                        "*/g/*",
+                        "*/f/*",
+                        "*/m/*",
+                        "*/l/*",
+                        "*/c/*",
+                        "*/tag-imutavel*",
+                        "*/*filtro=*",
+                        "*{\"id\":*{\"id\":*{\"id\":*{\"id\":*"
+                ]
+        },
+        "magazineluiza.com.br" : {
+                "allow" : [
+                
+                ],
+                "disallow" : [
+                        "/seguro/",
+                        "/quemsomos/xml/Topos.xml",
+                        "/Estaticas/",
+                        "/boleto/",
+                        "/nota-fiscal/",
+                        "/institucional/",
+                        "/weba/",
+                        "/Includes/",
+                        "/*?sfilters=0",
+                        "/crossdomain.xml",
+                        "/resenha/css/",
+                        "/includes/",
+                        "/compra/",
+                        "/estaticas/"
+                ]
+        },
+        "havan.com.br" : {
+                "allow" : [
+                        "/media/",
+                        "/*?p="
+                ],
+                "disallow" : [
+                        "/404/",
+                        "/hvn1986/",
+                        "/productpageshipping/",
+                        "/catalog/product_compare/",
+                        "/catalog/category/view/",
+                        "/catalog/product/view/",
+                        "/catalog/product/gallery/",
+                        "/catalogsearch/",
+                        "/checkout/",
+                        "/*?",
+                        "/*?p=*&"
+                ]
+        },
+        "gazin.com.br" : {
+                "allow" : [
+                
+                ],
+                "disallow" : [
+
+                ]
+        },
+        "extra.com.br" : {
+                "allow" : [
+                
+                ],
+                "disallow" : [
+                        "/site/",
+                        "/Site/",
+                        "/redirect/",
+                        "*strbusca=",
+                        "*strBusca=",
+                        "*ordenacao=",
+                        "*Ordenacao="
+                ]
+        },
+        "submarino.com.br" : {
+                "allow" : [
+                
+                ],
+                "disallow" : [
+                        "/avaliacao",
+                        "/parceiros",
+                        "/product-description",
+                        "/portal",
+                        "/garantia",
+                        "/estaticapop",
+                        "/search",
+                        "/incluir_prime",
+                        "/*cage.html",
+                        "*/g/*",
+                        "*/f/*",
+                        "*/m/*",
+                        "*/l/*",
+                        "*/c/*",
+                        "*/tag-imutavel*",
+                        "*/*filtro=*",
+                        "*{\"id\":*{\"id\":*{\"id\":*{\"id\":*"
+                ]
+        },
+        "ricardoeletro.com.br" : {
+                "allow" : [
+                
+                ],
+                "disallow" : [
+                        "/Pagamento/",
+                        "/Atendimento/",
+                        "/Carrinho/",
+                        "/css/",
+                        "/images/",
+                        "/Checkout/Finalizacao/",
+                        "/js/",
+                        "/checkout/"
+                ]
+        },
+        "carrefour.com.br" : {
+                "allow" : [
+                
+                ],
+                "disallow" : [
+                        "/img/*",
+                        "/account/*",
+                        "/login/*",
+                        "/checkout/*",
+                        "/busca/*",
+                        "/quick-view/*",
+                        "/espiar/*"
+                ]
+        },
+        "colombo.com.br" : {
+                "allow": [
+
+                ],
+                "disallow": [
+                        "/pesquisa",
+                        "/email",
+                        "/xml",
+                        "/calculaFreteItem",
+                        "/hotsite",
+                        "/promo",
+                        "/lojista/Colombo-Admin-Marketplace",
+                        "*.pdf",
+                        "appstatic.colombo.com.br*",
+                        "appteste.colombo.com.br*"
+                ]
+        }
+}
