@@ -1,4 +1,11 @@
 from random import randint
+import json
+
+def getRobotsDir(site: str, permissao: str = 'disallow') -> list:
+    j = None
+    with open('robotsSites.json', 'r') as arqjson:
+        j = json.load(arqjson)
+    return j[site][permissao]
 
 def getHeaders() -> dict:
     d = [
