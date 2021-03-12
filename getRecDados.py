@@ -1,11 +1,32 @@
 from random import randint
-import json
+from csv import reader
 
-def getRobotsDir(site: str, permissao: str = 'disallow') -> list:
-    j = None
-    with open('robotsSites.json', 'r') as arqjson:
-        j = json.load(arqjson)
-    return j[site][permissao]
+def getBagOfWords() -> list:
+    output = None
+    # Obs: qualquer edição no bag of words deverá
+    # envolver alteração nos ifs do classificador
+    with open('bag_of_words.csv', 'r') as arqcsv:
+        c = reader(arqcsv, delimiter=',')
+        output = [l for l in c]
+    return output[0]
+
+
+def getRobots(s:str) -> list:
+    link = {
+        'amazon.com.br': '',
+        'mercadolivre.com.br': '',
+        'casasbahia.com.br': '',
+        'americanas.com.br': '',
+        'magazineluiza.com.br': '',
+        'havan.com.br': '',
+        'gazin.com.br': '',
+        'extra.com.br': '',
+        'submarino.com.br': '',
+        'ricardoeletro.com.br': '',
+        'carrefour.com.br': '',
+        'colombo.com.br': ''
+    }
+    return link[s]
 
 def getHeaders() -> dict:
     d = [
