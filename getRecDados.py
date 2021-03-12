@@ -1,5 +1,12 @@
 from random import randint
+from json import load
 from csv import reader
+
+def getRobotsDir(site: str, permissao: str = 'disallow') -> list:
+    j = None
+    with open('robotsSites.json', 'r') as arqjson:
+        j = load(arqjson)
+    return j[site][permissao]
 
 def getBagOfWords() -> list:
     output = None
@@ -9,7 +16,6 @@ def getBagOfWords() -> list:
         c = reader(arqcsv, delimiter=',')
         output = [l for l in c]
     return output[0]
-
 
 def getRobots(s:str) -> list:
     link = {
