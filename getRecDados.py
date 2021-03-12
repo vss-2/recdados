@@ -2,6 +2,18 @@ from random import randint
 from json import load
 from csv import reader
 
+def getRotulos(arq: str = '10_exemplos_positivos_e_negativos.json') -> list:
+    js = None
+    p = n = []
+    with open('10_exemplos_positivos_e_negativos.json', 'r') as arqjson:
+        js = load(arqjson)
+        for chave in js:
+            for valor in js[chave]['positivos']:
+                p.append(js[chave]['positivos'][valor])
+            for valor in js[chave]['negativos']:
+                n.append(js[chave]['negativos'][valor])
+    return [p,n]
+
 def getRobotsDir(site: str, permissao: str = 'disallow') -> list:
     j = None
     with open('robotsSites.json', 'r') as arqjson:
