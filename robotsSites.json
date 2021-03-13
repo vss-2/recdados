@@ -1,5 +1,5 @@
 {
-        "amazon.com.br" : {
+        "https://www.amazon.com.br" : {
                 "allow" : [
                         "/*/dp/",
                         "/gp/adlp/",
@@ -53,10 +53,10 @@
                         "/gp/help/reports/infringement/jquery/handle-notice-submit.html",
                         "/gp/help/customer/handler/handle-email-submit.html",
                         "/gp/ask-widget/askWidget",
-                        "/gp/cart ",
-                        "/gp/flex ",
-                        "/gp/product/e-mail-friend ",
-                        "/gp/product/product-availability ",
+                        "/gp/cart",
+                        "/gp/flex",
+                        "/gp/product/e-mail-friend",
+                        "/gp/product/product-availability",
                         "/gp/product/rate-this-item",
                         "/ss/customer-reviews/lighthouse/",
                         "/hz/leaderboard/top-reviewers/",
@@ -73,7 +73,7 @@
                         "/hz/contact-us/ajax/initiate-trusted-contact/"
                 ]
         },
-        "mercadolivre.com.br" : {
+        "https://www.mercadolivre.com.br" : {
                 "allow" : [
                 ],
                 "disallow" : [
@@ -102,7 +102,7 @@
                         "/registration?confirmation_url*"
                 ]
         },
-        "casasbahia.com.br" : {
+        "https://www.casasbahia.com.br" : {
                 "allow" : [
                 
                 ],
@@ -116,7 +116,7 @@
                         "*Ordenacao="
                 ]
         },
-        "americanas.com.br" : {
+        "https://www.americanas.com.br" : {
                 "allow" : [
                 
                 ],
@@ -140,7 +140,7 @@
                         "*{\"id\":*{\"id\":*{\"id\":*{\"id\":*"
                 ]
         },
-        "magazineluiza.com.br" : {
+        "https://www.magazineluiza.com.br" : {
                 "allow" : [
                 
                 ],
@@ -161,7 +161,7 @@
                         "/estaticas/"
                 ]
         },
-        "havan.com.br" : {
+        "https://www.havan.com.br" : {
                 "allow" : [
                         "/media/",
                         "/*?p="
@@ -180,7 +180,7 @@
                         "/*?p=*&"
                 ]
         },
-        "gazin.com.br" : {
+        "https://www.gazin.com.br" : {
                 "allow" : [
                 
                 ],
@@ -188,7 +188,7 @@
 
                 ]
         },
-        "extra.com.br" : {
+        "https://www.extra.com.br" : {
                 "allow" : [
                 
                 ],
@@ -202,7 +202,7 @@
                         "*Ordenacao="
                 ]
         },
-        "submarino.com.br" : {
+        "https://www.submarino.com.br" : {
                 "allow" : [
                 
                 ],
@@ -226,7 +226,7 @@
                         "*{\"id\":*{\"id\":*{\"id\":*{\"id\":*"
                 ]
         },
-        "ricardoeletro.com.br" : {
+        "https://www.ricardoeletro.com.br" : {
                 "allow" : [
                 
                 ],
@@ -241,7 +241,7 @@
                         "/checkout/"
                 ]
         },
-        "carrefour.com.br" : {
+        "https://www.carrefour.com.br" : {
                 "allow" : [
                 
                 ],
@@ -255,7 +255,7 @@
                         "/espiar/*"
                 ]
         },
-        "colombo.com.br" : {
+        "https://www.colombo.com.br" : {
                 "allow": [
 
                 ],
