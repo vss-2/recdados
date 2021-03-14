@@ -7,13 +7,11 @@ from json import load
 
 def main():
     cs = None
-    options = webdriver.ChromeOptions()
-    #options.add_argument('headless')
-    #options.add_argument('window-size: 1920x1080')
-    driver = webdriver.Chrome(options=options)
     with open("robotsSites.json", "r") as read_file:
         robotstxt = load(read_file)
-    
+    options = webdriver.ChromeOptions()
+    options.add_argument("--enable-javascript")
+    driver = webdriver.Chrome(options=options)
     with open('sites.csv', 'r') as arqcsv:
         reader = csv.reader(arqcsv, delimiter = ',')
         rows = list(reader)
@@ -21,28 +19,53 @@ def main():
         visitedlist = []
         for k in linkslist:
             count = 0
-            while (count < 1000):
-                count += 1    
-                sitelinks = []
-                sitelinks.append((k,1))   
+            sitelinks = []
+            sitelinks.append(k)
+            while (count < 1000):  
                 driver.get(sitelinks[count])
+                driver.add_cookie({"name": "foo1", "value": "value", 'sameSite': 'Lax'})
                 page = driver.page_source
                 soup = BeautifulSoup(page, 'html.parser')
-                #for link in soup.find_all('a'):
-                #    print(link.get('href'))
+                for link in soup.find_all('a'):
+                    #check and correct //
+                    strlink = link.get('href')
+                    if(not strlink == None):
+                        if strlink[0:2] == "//" :
+                            strlink = strlink[2:]
+                        #start with / or contain "home - http"
+                        if (strlink[0:1] == "/"):
+                            strlink = k + strlink
+                        if (strlink[0:3] == "www"):
+                            strlink = "https://" + strlink    
+                        if filter(strlink, k, robotstxt[k]["disallow"] ):
+                            if strlink not in sitelinks:
+                                if strlink[0:5] == "https":
+                                    sitelinks.append(strlink)
+                #sleep(100)
+                count += 1  
+            visitedlist.apend(sitelinks)
+        
     return
-def filter(link) -> bool:
-    disallowCheck()
-    alreadyVisited()
-    
 
-def disallowCheck() -> bool: 
-    x = 0
-def alreadyVisited() -> bool: 
-    x = 0
-def regularExpression(expr, str) -> bool:   
+def filter(link, root, disallowList) -> bool:
+    
+    if not regularExpression(root[12:], link):
+        return False
+    if not disallowCheck(link, disallowList):
+        return False
+    return True
+
+def disallowCheck(link, disallowList) -> bool: 
+    for disallow in disallowList:
+        if regularExpression(disallow, link):
+            return False
+    return True
+
+def regularExpression(expr, str) -> bool: 
+    if expr[0:1] == "*":
+        expr = "."+expr
     result = re.search(expr, str)
-    if result == None:
+    if not result == None:
         return True
     return False    
 if __name__ == "__main__":

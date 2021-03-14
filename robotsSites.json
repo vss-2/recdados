@@ -113,7 +113,10 @@
                         "*strbusca=",
                         "*strBusca=",
                         "*ordenacao=",
-                        "*Ordenacao="
+                        "*Ordenacao=",
+                        "carrinho",
+                        "basket",
+                        "checkout"
                 ]
         },
         "https://www.americanas.com.br" : {
@@ -137,6 +140,9 @@
                         "*/c/*",
                         "*/tag-imutavel*",
                         "*/*filtro=*",
+                        "carrinho",
+                        "basket",
+                        "checkout",
                         "*{\"id\":*{\"id\":*{\"id\":*{\"id\":*"
                 ]
         },
@@ -176,7 +182,6 @@
                         "/catalog/product/gallery/",
                         "/catalogsearch/",
                         "/checkout/",
-                        "/*?",
                         "/*?p=*&"
                 ]
         },
@@ -199,7 +204,10 @@
                         "*strbusca=",
                         "*strBusca=",
                         "*ordenacao=",
-                        "*Ordenacao="
+                        "*Ordenacao=",
+                        "carrinho",
+                        "basket",
+                        "checkout"
                 ]
         },
         "https://www.submarino.com.br" : {
@@ -223,6 +231,9 @@
                         "*/c/*",
                         "*/tag-imutavel*",
                         "*/*filtro=*",
+                        "carrinho",
+                        "basket",
+                        "checkout",
                         "*{\"id\":*{\"id\":*{\"id\":*{\"id\":*"
                 ]
         },
