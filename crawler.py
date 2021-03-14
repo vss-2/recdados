@@ -1,3 +1,4 @@
+import json
 from bs4 import BeautifulSoup
 import csv
 from selenium import webdriver
@@ -23,7 +24,6 @@ def main():
             sitelinks.append(k)
             while (count < 1000):  
                 driver.get(sitelinks[count])
-                driver.add_cookie({"name": "foo1", "value": "value", 'sameSite': 'Lax'})
                 page = driver.page_source
                 soup = BeautifulSoup(page, 'html.parser')
                 for link in soup.find_all('a'):
@@ -43,8 +43,12 @@ def main():
                                     sitelinks.append(strlink)
                 #sleep(100)
                 count += 1  
-            visitedlist.apend(sitelinks)
-        
+            visitedlist.append(sitelinks)
+        data = {}     
+        for site in visitedlist:
+            data[site[0]] = site
+        with open('crawlerResult.json', 'w') as outfile:
+            json.dump(data, outfile) 
     return
 
 def filter(link, root, disallowList) -> bool:
