@@ -22,7 +22,7 @@ def main():
             count = 0
             sitelinks = []
             sitelinks.append(k)
-            while (count < 1000):  
+            while (count < 1000 or len(sitelinks)<= count):  
                 driver.get(sitelinks[count])
                 page = driver.page_source
                 soup = BeautifulSoup(page, 'html.parser')
@@ -41,7 +41,7 @@ def main():
                             if strlink not in sitelinks:
                                 if strlink[0:5] == "https":
                                     sitelinks.append(strlink)
-                #sleep(100)
+                #sleep(10)
                 count += 1  
             visitedlist.append(sitelinks)
         data = {}     
