@@ -2,6 +2,16 @@ from random import randint
 from json import load
 from csv import reader
 
+def getPalavrasRem() -> set:
+    # Palavras removidas
+    s = set({'', ' ', 'a', 'à', 'e', 'in', 'sem', 'com', 'de', 'do', 'da', 'para', 
+    'no', 'na', 'nos', 'nas', 'novo', 'nova', 'americanas', 'carrefour', 'casasbahia', 'colombo', 'extra', 
+    'gazin', 'havan', 'magazine', 'magazineluiza', 'luiza', 'mercado', 'mercadolivre', 'livre', 'ricardo eletro', 'submarino'})
+    for num in range(0,100):
+        s.add(str(num))
+        s.add(str(num)+'\"')
+    return s
+
 def getRotulos(arq: str = '10_exemplos_positivos_e_negativos.json') -> list:
     js = None
     p = n = []
