@@ -1,21 +1,30 @@
 from bs4 import BeautifulSoup
 from csv import reader
-from getRecDados import getPalavrasRem
+from getRecDados import getPalavrasRem, getSitesLista
 from unicodedata import normalize
+import zipfile
 
-def featureSelection():
+def featureSelection(posneg: str = 'pos', contar: bool = False):
 
-    sites = ['americanas', 'carrefour', 'casasbahia', 'colombo', 'extra', 
-    'gazin', 'havan', 'magazineluiza', 'mercadolivre', 'ricardoeletro', 'submarino']
+    sites = getSitesLista()
+
+    if posneg == 'pos':
+        nstart, nend = 1,11
+    else:
+        nstart, nend = 11,21
 
     dados = []
     for s in sites:
-        for n in range(1,10):
-            sopa = BeautifulSoup(open('/home/vitor/Github/recdados/minerados/db/{}/{}.html'.format(s, n)).read(), features='html.parser')
-            
-            # fa = sopa.find_all('table')
-            # for f in fa:
-                # dados.extend(f)
+        for n in range(nstart, nend):
+            try:
+                sopa = BeautifulSoup(open('/home/vitor/Github/recdados/minerados/db/{}/{}.html'.format(s, n)).read(), features='html.parser')
+            except FileNotFoundError:
+                try: 
+                    with zipfile.ZipFile('./10_sites_de_cada_exemplo.zip', 'r') as arqzip:
+                        arqzip.extractall('./minerados/db/')
+                except:    
+                    print('Pasta \'minerados/db/\' faltando, favor deszipar o arquivo \'10_sites_de_cada_exemplo.zip\' dentro dela')
+                    exit()
             
             try:
                 if sopa.title.string != None:
@@ -54,7 +63,10 @@ def featureSelection():
         for valor in dados:
             try:
                 if valor in s and valor not in gPR:
-                    arqcsv.write(str(valor)+': '+str(dados.count(valor))+'\n')
+                    if contar:
+                        arqcsv.write(str(valor)+': '+str(dados.count(valor))+'\n')
+                    else:
+                        arqcsv.write(str(valor)+'\n')
                     s.remove(valor)
             except:
                 print(valor)
@@ -62,11 +74,14 @@ def featureSelection():
 
     return 
 
-def featureSelecionadas(n: int = 10):
+def featureSelecionadas(n: int = 10, contar: bool = False):
     with open('feature_selection.csv', 'r') as arqcsv:
         leitor = reader(arqcsv, delimiter='\n')
-        topfeats = [(l[0].split(': ')[0], int(l[0].split(': ')[1])) for l in leitor]
-        topfeats.sort(key=lambda x: x[1])
+        if contar:
+            topfeats = [(l[0].split(': ')[0], int(l[0].split(': ')[1])) for l in leitor]
+            topfeats.sort(key=lambda x: x[1])
+        else:
+            topfeats = [l[0].split(': ')[0] for l in leitor]
         # print(topfeats)
         print(topfeats[-n:])
     return

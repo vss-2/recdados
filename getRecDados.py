@@ -1,15 +1,25 @@
 from random import randint
 from json import load
 from csv import reader
+from time import sleep
+from requests import get
 
-def getPalavrasRem() -> set:
+def getSitesLista() -> list:
+    return ['americanas', 'carrefour', 'casasbahia', 'colombo', 'extra', 
+    'gazin', 'havan', 'magazineluiza', 'mercadolivre', 'ricardoeletro', 'submarino']
+
+def getPalavrasRem(remPol: bool = True) -> set:
     # Palavras removidas
     s = set({'', ' ', 'a', 'à', 'e', 'in', 'sem', 'com', 'de', 'do', 'da', 'para', 
     'no', 'na', 'nos', 'nas', 'novo', 'nova', 'americanas', 'carrefour', 'casasbahia', 'colombo', 'extra', 
     'gazin', 'havan', 'magazine', 'magazineluiza', 'luiza', 'mercado', 'mercadolivre', 'livre', 'ricardo eletro', 'submarino'})
-    for num in range(0,100):
-        s.add(str(num))
-        s.add(str(num)+'\"')
+    if remPol:
+        for num in range(0,100):
+            s.add(str(num))
+            s.add(str(num)+'\"')
+            s.add(str(num)+'”')
+            s.add(str(num)+'\'')
+            s.add(str(num)+'\'\'')
     return s
 
 def getRotulos(arq: str = '10_exemplos_positivos_e_negativos.json') -> list:
@@ -66,3 +76,24 @@ def getHeaders() -> dict:
         {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.90 Safari/537.36'}
     ]
     return d[randint(0, len(d)-1)]
+
+def getSitesTerminal(posneg: str = 'pos'):
+    if posneg == 'pos':
+        nstart, nend = 1,11
+        pn = 0
+    else:
+        nstart, nend = 11,21
+        pn = 1
+    
+    sites = getSitesLista()
+    rot = getRotulos()[0] if posneg == 'pos' else getRotulos()[1]
+
+    for s in sites:
+        for n in range(nstart, nend):
+            f = n-10 if nstart > 10 else n
+            with open('./minerados/db/{}/{}.html'.format(s, n), 'w') as arqhtml:
+                result = get(url = rot[f], headers = getHeaders())
+                arqhtml.write(result.text)
+                arqhtml.close()
+                sleep(60)
+    return
