@@ -4,6 +4,9 @@ from csv import reader
 from time import sleep
 from requests import get
 from os.path import exists
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from bs4 import BeautifulSoup
 
 def getSitesLista() -> list:
     return ['amazon', 'mercadolivre', 'casasbahia', 'americanas', 'magazineluiza', 
@@ -25,7 +28,7 @@ def getPalavrasRem(remPol: bool = True) -> set:
 
 def getRotulos(arq: str = '10_exemplos_positivos_e_negativos.json') -> list:
     js = None
-    p = n = []
+    p, n = [], []
     with open('10_exemplos_positivos_e_negativos.json', 'r') as arqjson:
         js = load(arqjson)
         for chave in js:
@@ -78,7 +81,7 @@ def getHeaders() -> dict:
     ]
     return d[randint(0, len(d)-1)]
 
-def getSitesTerminal(posneg: str = 'pos'):
+def getSitesTerminal(posneg: str = 'pos', selenium: bool = True):
     if posneg == 'pos':
         nstart, nend = 1,11
         pn = 0
@@ -93,12 +96,27 @@ def getSitesTerminal(posneg: str = 'pos'):
         print(s)
         for n in range(nstart, nend):
             f = n-10 if nstart > 10 else n
-            if not exists('./minerados/db/{}/{}.html'.format(s, n)):
-                with open('./minerados/db/{}/{}.html'.format(s, n), 'w') as arqhtml:
-                    print(rot[f])
-                    result = get(url = rot[f], headers = getHeaders())
-                    arqhtml.write(result.text)
-                    arqhtml.close()
-                    print(n, sep=' ', end='\n')
-                    sleep(60)
+            print(rot[f])
+            if selenium:
+                    options = Options()
+                    options.binary_location = '/usr/bin/brave-browser'
+                    options.add_argument("--enable-javascript")
+                    driver = webdriver.Chrome(options=options, executable_path='/usr/local/bin/chromedriver')
+                    driver.get(rot[f])
+                    if not exists('./minerados/db/{}/{}.html'.format(s, n)):
+                        with open('./minerados/db/{}/{}.html'.format(s, n), 'w') as arqhtml:
+                            arqhtml.write(driver.page_source)
+                            arqhtml.close()
+                            sleep(8.5)
+                            driver.close()
+                            sleep(1.5)
+            else:
+                if not exists('./minerados/db/{}/{}.html'.format(s, n)):
+                    with open('./minerados/db/{}/{}.html'.format(s, n), 'w') as arqhtml:
+                        result = get(url = rot[f], headers = getHeaders())
+                        arqhtml.write(result.text)
+                        arqhtml.close()
+                        sleep(60)
+            print(n, sep=' ', end='\n')
+
     return

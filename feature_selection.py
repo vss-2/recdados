@@ -40,6 +40,8 @@ def featureSelection(posneg: str = 'pos', contar: bool = False):
                         titulo = titulo.replace('|', ' ')
                     if(':' in titulo):
                         titulo = titulo.replace(':', ' ')
+                    if('+' in titulo):
+                        titulo = titulo.replace('+', ' ')
                     
                     titulo = titulo.casefold().split(' ')
 
