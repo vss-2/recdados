@@ -3,10 +3,11 @@ from json import load
 from csv import reader
 from time import sleep
 from requests import get
+from os.path import exists
 
 def getSitesLista() -> list:
-    return ['americanas', 'carrefour', 'casasbahia', 'colombo', 'extra', 
-    'gazin', 'havan', 'magazineluiza', 'mercadolivre', 'ricardoeletro', 'submarino']
+    return ['amazon', 'mercadolivre', 'casasbahia', 'americanas', 'magazineluiza', 
+        'havan', 'gazin', 'extra', 'submarino', 'ricardoeletro', 'carrefour', 'colombo'] 
 
 def getPalavrasRem(remPol: bool = True) -> set:
     # Palavras removidas
@@ -89,11 +90,15 @@ def getSitesTerminal(posneg: str = 'pos'):
     rot = getRotulos()[0] if posneg == 'pos' else getRotulos()[1]
 
     for s in sites:
+        print(s)
         for n in range(nstart, nend):
             f = n-10 if nstart > 10 else n
-            with open('./minerados/db/{}/{}.html'.format(s, n), 'w') as arqhtml:
-                result = get(url = rot[f], headers = getHeaders())
-                arqhtml.write(result.text)
-                arqhtml.close()
-                sleep(60)
+            if not exists('./minerados/db/{}/{}.html'.format(s, n)):
+                with open('./minerados/db/{}/{}.html'.format(s, n), 'w') as arqhtml:
+                    print(rot[f])
+                    result = get(url = rot[f], headers = getHeaders())
+                    arqhtml.write(result.text)
+                    arqhtml.close()
+                    print(n, sep=' ', end='\n')
+                    sleep(60)
     return
