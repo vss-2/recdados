@@ -91,25 +91,29 @@ def getSitesTerminal(posneg: str = 'pos', selenium: bool = True):
     
     sites = getSitesLista()
     rot = getRotulos()[0] if posneg == 'pos' else getRotulos()[1]
+    
+    options, driver = None, None
+    if selenium:
+        options = Options()
+        options.binary_location = '/usr/bin/brave-browser'
+        options.add_argument("--enable-javascript")
+        driver = webdriver.Chrome(options=options, executable_path='/usr/local/bin/chromedriver')
 
     for s in sites:
         print(s)
         for n in range(nstart, nend):
             f = n-10 if nstart > 10 else n
-            print(rot[f])
+            f -= 1
+            # print(rot[f])
             if selenium:
-                    options = Options()
-                    options.binary_location = '/usr/bin/brave-browser'
-                    options.add_argument("--enable-javascript")
-                    driver = webdriver.Chrome(options=options, executable_path='/usr/local/bin/chromedriver')
-                    driver.get(rot[f])
                     if not exists('./minerados/db/{}/{}.html'.format(s, n)):
+                        driver.get(rot[f])
                         with open('./minerados/db/{}/{}.html'.format(s, n), 'w') as arqhtml:
                             arqhtml.write(driver.page_source)
                             arqhtml.close()
-                            sleep(8.5)
-                            driver.close()
-                            sleep(1.5)
+                            sleep(8)
+                            driver.execute_script("window.home();")
+                            sleep(2)
             else:
                 if not exists('./minerados/db/{}/{}.html'.format(s, n)):
                     with open('./minerados/db/{}/{}.html'.format(s, n), 'w') as arqhtml:
