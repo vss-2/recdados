@@ -104,23 +104,27 @@ def getSitesTerminal(posneg: str = 'pos', selenium: bool = True):
         for n in range(nstart, nend):
             f = n-10 if nstart > 10 else n
             f -= 1
-            # print(rot[f])
+
             if selenium:
                     if not exists('./minerados/db/{}/{}.html'.format(s, n)):
+                        print(rot[f])
                         driver.get(rot[f])
                         with open('./minerados/db/{}/{}.html'.format(s, n), 'w') as arqhtml:
                             arqhtml.write(driver.page_source)
                             arqhtml.close()
-                            sleep(8)
-                            driver.execute_script("window.home();")
+                            sleep(4)
+                            driver.back()
                             sleep(2)
             else:
                 if not exists('./minerados/db/{}/{}.html'.format(s, n)):
+                    print(rot[f])
                     with open('./minerados/db/{}/{}.html'.format(s, n), 'w') as arqhtml:
                         result = get(url = rot[f], headers = getHeaders())
                         arqhtml.write(result.text)
                         arqhtml.close()
                         sleep(60)
             print(n, sep=' ', end='\n')
+        rot = rot[10:]
+        print('Restam {} links a serem visitados'.format(len(rot)))
 
     return
