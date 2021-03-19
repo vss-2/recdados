@@ -8,6 +8,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 
+def getTagsRem() -> list:
+    return ['script', 'style', 'noscript', 'img', 'input', 'br', 'option', 'form', 'polygon', 'svg']
+
 def getSitesLista() -> list:
     return ['amazon', 'mercadolivre', 'casasbahia', 'americanas', 'magazineluiza', 
         'havan', 'gazin', 'extra', 'submarino', 'ricardoeletro', 'carrefour', 'colombo'] 

@@ -5,6 +5,38 @@ from selenium import webdriver
 from time import sleep
 import re
 from json import load
+from getRecDados import getBagOfWords, getTagsRem
+
+def heuristica(soup):
+    tags_rm = getTagsRem()
+    
+    for t in tags_rm:
+        for element in soup.findAll(t):
+            element.extract()
+
+    return
+
+def filtroGuiado(soup):
+    a_com_link = soup.findAll('a', href=True)
+    sitesAvisitar = []
+    bow_estatico = getBagOfWords()
+    
+    for acl in a_com_link:
+        for a in acl:
+            try:
+                k = a.find('span', href=False, recursive=True)
+                if k:
+                    for j in k:
+                        link_a_class = ' '.join(str(j).casefold().split())
+                        nota = classificador(link_a_class)
+                        link_real = k.findParent('a')['href']
+                        if nota > 1:
+                            sitesAvisitar.insert(0, (link_real, nota))
+            except Exception as e:
+                # print(e)
+                pass
+    # print(sitesAvisitar)
+    return
 
 def main():
     cs = None

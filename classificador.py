@@ -1,12 +1,15 @@
 import re
 from getRecDados import getBagOfWords
 
-def classificador() -> int:
+def classificador(texto: str = '') -> int:
     score = 1
 
-    separadores = {0: '-', 1: '_', 2: ' ', 3: '/'}
+    if texto == '': return 0
+    else: link = texto
 
-    link = str(input()).casefold().replace('\'','').replace('\"','')
+    separadores = {0: '-', 1: '_', 2: ' ', 3: '/', 4: ','}
+
+    # link = str(input()).casefold().replace('\'','').replace('\"','')
     identificar = []
 
     for i in separadores:
@@ -59,7 +62,7 @@ def classificador() -> int:
     try:
         # Removendo polegadas pela expressão regular
         valor = re.search(splsep+'[0-9]{2}'+splsep, link_bkp)
-        print(valor, splsep, link_bkp)
+        # print(valor, splsep, link_bkp)
         # print(valor.regs)
         if(valor.regs):
             # print(str(link_bkp[valor.regs[0][0]+1:valor.regs[0][1]-1]))
