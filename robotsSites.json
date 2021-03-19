@@ -50,6 +50,11 @@
                         "/your-orders"
                 ],
                 "disallow" : [
+                        "/ap/forgotpassword",
+                        "/ap/signin",
+                        "/ap/register",
+                        "/balance",
+                        "/hp/payment/history",
                         "/gp/help/reports/infringement/jquery/handle-notice-submit.html",
                         "/gp/help/customer/handler/handle-email-submit.html",
                         "/gp/ask-widget/askWidget",
@@ -77,6 +82,8 @@
                 "allow" : [
                 ],
                 "disallow" : [
+                        "/privacidade",
+                        "/registration",
                         "/HOME/",
                         "/gz/merch/",
                         "/gz/menu",
@@ -164,7 +171,11 @@
                         "/resenha/css/",
                         "/includes/",
                         "/compra/",
-                        "/estaticas/"
+                        "/estaticas/",
+                        "/empresas",
+                        "//luizacompany/",
+                        "/filiais/",
+                        "/cliente/"
                 ]
         },
         "https://www.havan.com.br" : {
@@ -182,7 +193,14 @@
                         "/catalog/product/gallery/",
                         "/catalogsearch/",
                         "/checkout/",
-                        "/*?p=*&"
+                        "/*?p=*&",
+                        "/Portal/",
+                        "/customer/",
+                        "/Convidado/",
+                        "/Checkout/",
+                        "/Content/Images/",
+                        "/ControleAcessoExternoAPI/",
+                        "/loginnopassword/"
                 ]
         },
         "https://www.gazin.com.br" : {
@@ -249,7 +267,8 @@
                         "/images/",
                         "/Checkout/Finalizacao/",
                         "/js/",
-                        "/checkout/"
+                        "/checkout/",
+                        "/Cliente/"
                 ]
         },
         "https://www.carrefour.com.br" : {
@@ -263,7 +282,10 @@
                         "/checkout/*",
                         "/busca/*",
                         "/quick-view/*",
-                        "/espiar/*"
+                        "/espiar/*",
+                        "/blog/",
+                        "/dica-amiga",
+                        "/auth/"
                 ]
         },
         "https://www.colombo.com.br" : {
@@ -280,7 +302,8 @@
                         "/lojista/Colombo-Admin-Marketplace",
                         "*.pdf",
                         "appstatic.colombo.com.br*",
-                        "appteste.colombo.com.br*"
+                        "appteste.colombo.com.br*",
+                        "/blog/"
                 ]
         }
 }
