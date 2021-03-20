@@ -2,72 +2,34 @@ import re
 from getRecDados import getBagOfWords
 
 def classificador(texto: str = '') -> int:
-    score = 1
+    if texto == '':
+        return 0
 
-    if texto == '': return 0
-    else: link = texto
+    texto = texto.casefold()
 
-    separadores = {0: '-', 1: '_', 2: ' ', 3: '/', 4: ','}
+    for x in ['-', '_', ',', '/']:
+        texto = texto.replace(x, ' ')
 
-    # link = str(input()).casefold().replace('\'','').replace('\"','')
-    identificar = []
-
-    for i in separadores:
-        identificar.append(link.count(separadores[i]))  
-
-    link_bkp = link
-    splsep = separadores[identificar.index(max(identificar))]
-    # Pode ser interessante aplicar sucessivos splits em separadores
-    link = link.split(splsep)
+    texto_sp = texto.split(' ')
+    texto_sp = [k.strip() for k in texto_sp]
 
     bow = getBagOfWords()
 
-    while any(x in bow for x in link):
-        if 'tv' in link and 'smart' in link:
-            link.remove('smart')
-            link.remove('tv')
+    score = 1
+
+    for b in bow:
+        if b in texto_sp:
             score *= 2
-        if 'led' in link:
-            link.remove('led')
-            score *= 2
-        if 'lcd' in link:
-            link.remove('lcd')
-            score *= 2
-        if 'oled' in link:
-            link.remove('oled')
-            score *= 2
-        if 'qled' in link:
-            link.remove('qled')
-            score *= 2
-        if '4k' in link:
-            link.remove('4k')
-            score *= 2
-        if 'uhd' in link:
-            link.remove('uhd')
-            score *= 2
-        if 'hd' in link:
-            link.remove('hd')
-            score *= 2
-        if ('full' in link and 'hd' in link):
-            link.remove('full')
-            link.remove('hd')
-            score *= 2
-        if ('fhd' in link):
-            link.remove('fhd')
-            score *= 2
-        if ('resolucao' in link):
-            link.remove('resolucao')
-            score *= 2
-    
+
     try:
         # Removendo polegadas pela expressão regular
-        valor = re.search(splsep+'[0-9]{2}'+splsep, link_bkp)
+        valor = re.search('[0-9]{2}', texto)
         # print(valor, splsep, link_bkp)
-        # print(valor.regs)
+        print(valor.regs)
         if(valor.regs):
             # print(str(link_bkp[valor.regs[0][0]+1:valor.regs[0][1]-1]))
             # print(link)
-            link.remove(str(link_bkp[valor.regs[0][0]+1:valor.regs[0][1]-1]))
+            # link.remove(str(link_bkp[valor.regs[0][0]+1:valor.regs[0][1]-1]))
             score *= 2
     except:
         pass
@@ -76,4 +38,3 @@ def classificador(texto: str = '') -> int:
 
 if __name__ == '__main__':
     print(classificador())
-    
