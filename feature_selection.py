@@ -76,7 +76,7 @@ def featureSelection(posneg: str = 'pos', contar: bool = False):
 
     return 
 
-def featureSelecionadas(n: int = 10, contar: bool = False):
+def featureSelecionadas(n: int = 10, contar: bool = False) -> list:
     with open('feature_selection.csv', 'r') as arqcsv:
         leitor = reader(arqcsv, delimiter='\n')
         if contar:
@@ -85,10 +85,23 @@ def featureSelecionadas(n: int = 10, contar: bool = False):
         else:
             topfeats = [l[0].split(': ')[0] for l in leitor]
         # print(topfeats)
-        print(topfeats[-n:])
-    return
+        # print(topfeats[-n:])
+    return topfeats[-n:]
 
-if __name__ == '__main__':
-    featureSelection()
-    featureSelecionadas()
+def main():
+    with open('features.csv', 'w') as arqcsv:
+        featureSelection('pos', True)
+        f = featureSelecionadas(10, True)
+        for x in f:
+            arqcsv.write(str(x[0])+',')
+
+        featureSelection('neg', True)
+        f = featureSelecionadas(10, True)
+        for x in f:
+            if f.index(x) != len(f):
+                arqcsv.write(str(x[0])+',')
+            else:
+                arqcsv.write(str(x[0]))
     exit()
+
+main()
