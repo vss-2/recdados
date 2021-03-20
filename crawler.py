@@ -6,6 +6,8 @@ from time import sleep
 import re
 from json import load
 from getRecDados import getBagOfWords, getTagsRem
+from random import randint
+from os.path import exists
 
 def heuristica(soup):
     tags_rm = getTagsRem()
@@ -42,9 +44,18 @@ def main():
     cs = None
     with open("robotsSites.json", "r") as read_file:
         robotstxt = load(read_file)
-    options = webdriver.ChromeOptions()
-    options.add_argument("--enable-javascript")
-    driver = webdriver.Chrome(options=options)
+
+    vitorPC = False
+    if vitorPC:
+        options = webdriver.ChromeOptions()
+        options.add_argument("--enable-javascript")
+        options.binary_location = '/usr/bin/brave-browser'
+        driver = webdriver.Chrome(options=options, executable_path='/usr/local/bin/chromedriver')
+    else: 
+        options = webdriver.ChromeOptions()
+        options.add_argument("--enable-javascript")
+        driver = webdriver.Chrome(options=options)
+    
     with open('sites.csv', 'r') as arqcsv:
         reader = csv.reader(arqcsv, delimiter = ',')
         rows = list(reader)
@@ -57,6 +68,10 @@ def main():
             while (count < 1000 or len(sitelinks)<= count):  
                 driver.get(sitelinks[count])
                 page = driver.page_source
+                if not exists('./minerados/db/{}.html'.format(count+1000*(linkslist.index(k)))):
+                    with open('./minerados/db/{}.html'.format(count+1000*(linkslist.index(k))), 'w') as arqhtml:
+                        arqhtml.write(page)
+                        arqhtml.close()
                 soup = BeautifulSoup(page, 'html.parser')
                 for link in soup.find_all('a'):
                     #check and correct //
@@ -73,7 +88,14 @@ def main():
                             if strlink not in sitelinks:
                                 if strlink[0:5] == "https":
                                     sitelinks.append(strlink)
-                #sleep(10)
+                for f in range(randint(3, 13)):
+                    if f%2 == 1:
+                        driver.execute_script("window.scrollTo(0,document.body.scrollHeight/{})".format(f))
+                        sleep(0.6)
+                    else:
+                        driver.execute_script("window.scrollTo(0,document.body.scrollHeight/{})".format(f))
+                        sleep(0.4)
+                # sleep(12)
                 count += 1  
             visitedlist.append(sitelinks)
         data = {}     
