@@ -90,10 +90,10 @@ def main():
                                     sitelinks.append(strlink)
                 for f in range(randint(3, 13)):
                     if f%2 == 1:
-                        driver.execute_script("window.scrollTo(0,document.body.scrollHeight/{})".format(f))
+                        driver.execute_script("if(document.body.scrollHeight){window.scrollTo(0,document.body.scrollHeight/{}})".format(f))
                         sleep(0.6)
                     else:
-                        driver.execute_script("window.scrollTo(0,document.body.scrollHeight/{})".format(f))
+                        driver.execute_script("if(document.body.scrollHeight){window.scrollTo(0,document.body.scrollHeight/{}})".format(f))
                         sleep(0.4)
                 # sleep(12)
                 count += 1  
