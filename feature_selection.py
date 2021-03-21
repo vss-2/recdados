@@ -90,18 +90,27 @@ def featureSelecionadas(n: int = 10, contar: bool = False) -> list:
 
 def main():
     with open('features.csv', 'w') as arqcsv:
+        repetido = []
+
         featureSelection('pos', True)
         f = featureSelecionadas(10, True)
         for x in f:
+            repetido.append(x[0])
             arqcsv.write(str(x[0])+',')
 
         featureSelection('neg', True)
-        f = featureSelecionadas(10, True)
+        f = featureSelecionadas(20, True)
+        
+        f = [v[0] for v in f]
+        for r in repetido:
+            if r in f:
+                f.remove(r)
+
         for x in f:
-            if f.index(x) != len(f):
-                arqcsv.write(str(x[0])+',')
+            if f.index(x) < len(f)-1:
+                arqcsv.write(str(x)+',')
             else:
-                arqcsv.write(str(x[0]))
+                arqcsv.write(str(x))
     exit()
 
 main()
