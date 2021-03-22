@@ -19,7 +19,8 @@ def getPalavrasRem(remPol: bool = True) -> set:
     # Palavras removidas
     s = set({'', ' ', 'a', 'à', 'e', 'in', 'sem', 'com', 'de', 'do', 'da', 'para', 'casas bahia', 'casas', 'bahia', 'amazon',
     'no', 'na', 'nos', 'nas', 'novo', 'nova', 'americanas', 'carrefour', 'casasbahia', 'colombo', 'extra', 'br', 'em', 'até',
-    'gazin', 'havan', 'magazine', 'magazineluiza', 'luiza', 'mercado', 'mercadolivre', 'livre', 'ricardo eletro', 'submarino'})
+    'gazin', 'havan', 'magazine', 'magazineluiza', 'luiza', 'mercado', 'mercadolivre', 'livre', 'ricardo eletro', 'submarino',
+    'ricardo', 'eletro', 'carrinho', 'login'})
     if remPol:
         for num in range(0,100):
             s.add(str(num))
