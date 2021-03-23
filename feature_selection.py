@@ -111,4 +111,3 @@ def selecionar():
                 arqcsv.write(str(x)+',')
             else:
                 arqcsv.write(str(x))
-    exit()

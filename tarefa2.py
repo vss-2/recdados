@@ -13,6 +13,8 @@ from feature_selection import selecionar
 from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
+import pickle
+
 def minerador(sopa, feats):
     tags_rm = getTagsRem()
     
@@ -89,45 +91,96 @@ def minerador(sopa, feats):
 
     return bingo
 
-def main():
-    # selecionar()
+def classificador(novos_dados: bool = False):
+    if novos_dados or not exists('./features.csv'):
+        novos_dados = True
+        selecionar()
+        # selecionar = Seleciona e gera o arquivo features.csv
+
     feats = None
+
     with open('features.csv', 'r') as arqcsv:
         feats = reader(arqcsv, delimiter=',')
         feats = [c for c in feats][0]
         m = []
-        
-        for a in range(1, 21):
-            if exists('./minerados/db/ricardoeletro/{}.html'.format(a)):
-                with open('./minerados/db/ricardoeletro/{}.html'.format(a), 'r') as arqhtml:
-                    sopa = BeautifulSoup(arqhtml, 'html.parser')
-                    m.append(minerador(sopa, feats))
-        
-        # Coluna SIM/NAO identifica se é realmente um televisor
-        # for index, v in enumerate(m):
-        #     if index>9:
-        #         v.append(0)
-        #     else:
-        #         v.append(1)
-        # feats.append('SIM/NAO')
-
-        treino = pd.DataFrame(data = m, columns = feats)
-
+        treino = pd.DataFrame()
         mil = dict()
-        for a in range(1, 1000):
-            if exists('./minerados/mil/ricardoeletro/{}.html'.format(a)):
-                with open('./minerados/mil/ricardoeletro/{}.html'.format(a), 'r') as arqhtml2:
-                    sopa = BeautifulSoup(arqhtml2, 'html.parser')
-                    k = minerador(sopa, feats)
-                    mil.update({len(mil)+len(m):k})
-                    # print({len(mil)+len(m):k})
         
+        # Renomear todos os cantos onde está ricardoeletro
+        
+        if novos_dados:
+            # Lê os treinos da loja específica
+            
+            for a in range(1, 21):
+                if exists('./minerados/db/ricardoeletro/{}.html'.format(a)):
+                    with open('./minerados/db/ricardoeletro/{}.html'.format(a), 'r') as arqhtml:
+                        sopa = BeautifulSoup(arqhtml, 'html.parser')
+                        m.append(minerador(sopa, feats))
+            
+            treino = pd.DataFrame(data = m, columns = feats)
+
+            with open('./minerados/mil/ricardoeletro/treino', 'wb') as arqdados:
+                pickle.dump(treino, arqdados)
+
+            with open('./minerados/mil/ricardoeletro/m', 'wb') as arqdados:
+                pickle.dump(m, arqdados)
+
+        else:
+            
+            if exists('./minerados/mil/ricardoeletro/treino'):
+                with open('./minerados/mil/ricardoeletro/treino', 'rb') as arqdados:
+                    treino = pickle.load(arqdados)
+
+            if exists('./minerados/mil/ricardoeletro/m'):
+                with open('./minerados/mil/ricardoeletro/m', 'rb') as arqdados:
+                    m = pickle.load(arqdados)
+
+            else:
+                print('Arquivo treino ou m não encontrado, tente rodar com o parâmetro novos_dados = True')
+                exit()
+
+        if novos_dados:
+            
+            # Lê os 1000 htmls da loja específica
+            for a in range(1, 1000):
+                if exists('./minerados/mil/ricardoeletro/{}.html'.format(a)):
+                    with open('./minerados/mil/ricardoeletro/{}.html'.format(a), 'r') as arqhtml2:
+                        sopa = BeautifulSoup(arqhtml2, 'html.parser')
+                        k = minerador(sopa, feats)
+                        mil.update({len(mil)+len(m):k})
+
+            with open('./minerados/mil/ricardoeletro/mil', 'wb') as arqdados:
+                pickle.dump(mil, arqdados)
+
+        else:
+            if exists('./minerados/mil/ricardoeletro/mil'):
+                with open('./minerados/mil/ricardoeletro/mil', 'rb') as arqdados:
+                    mil = pickle.load(arqdados)
+            else:
+                print('Arquivo mil não encontrado, tente rodar com o parâmetro novos_dados = True')
+                exit()
+
+        df = None
+
+        # classificadores = ['Naive Bayes', 'Decision Tree', 'Multi Layer Perceptron', 'SVC', 'Regressao Logistica']
+        # classificadores['Naive Bayes']
         df = pd.DataFrame(list(mil.values()), columns = feats)
+        
+        # for c in classificadores:
+        #     if not exists('./minerados/mil/ricardoeletro/{}'.format(c)):
+        #         with open('./minerados/mil/ricardoeletro/{}'.format(c), 'wb') as arqdados:
+        #             pickle.dump(df, arqdados)
+        #     else:
+        #         with open('./minerados/mil/ricardoeletro/{}'.format(c), 'rb') as arqdados:
+        #             df = arqdados.load(arqdados)
+                    
+        # Juntar dataframes treino e df caso seja necessário:
         # print(treino.append(df,ignore_index=True))
 
         gnb = GaussianNB()
         gnb.fit(treino, [1]*10+[0]*10)
-        print(df.head())
-        print(gnb.predict(X=df))
+        # print(df.head())
+        result = gnb.predict(X=df)
+        print(result)
 
-main()
+classificador(novos_dados=False)
