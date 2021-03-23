@@ -11,6 +11,8 @@ from csv import reader
 from os.path import exists
 from feature_selection import selecionar
 from bs4 import BeautifulSoup
+from sklearn.metrics import accuracy_score, f1_score
+# import mlflow
 import pandas as pd
 import numpy as np
 import pickle
@@ -24,7 +26,8 @@ def minerador(sopa, feats):
 
     dados = []
     bingo = [0]*len(feats)
-    soma = 0
+    score_titulo = 0
+    score_body = 0
 
     # Tentar pegar informação do título
     try:
@@ -55,13 +58,12 @@ def minerador(sopa, feats):
                 if f in titulo:
                     b = titulo.count(f)
                     if index > len(feats)//2:
-                        soma -= 4*b
+                        score_titulo -= b
                         bingo[index] = 1
                     else:
-                        soma += 4*b
+                        score_titulo += b
                         bingo[index] = 1
             
-            # dados.extend(titulo)
     except Exception as e:
         print(e)
         pass
@@ -78,24 +80,30 @@ def minerador(sopa, feats):
         print(e)
         pass
 
+    titulo = list(filter(lambda x: x not in getPalavrasRem(), titulo))
     dados = list(filter(lambda x: x not in getPalavrasRem(), dados))
 
     for index, f in enumerate(feats, 0):
         if f in dados:
             if index > len(feats)//2:
-                soma -= dados.count(f)
+                score_body -= dados.count(f)
             else:
-                soma += dados.count(f)
+                score_body += dados.count(f)
 
     # print(bingo, soma)
+    # print(titulo, dados)
+
+    bingo[-2] = score_titulo
+    bingo[-1] = score_body
 
     return bingo
 
 def classificador(novos_dados: bool = False):
+    numfeats = 9
     if novos_dados or not exists('./features.csv'):
         novos_dados = True
-        selecionar()
-        # selecionar = Seleciona e gera o arquivo features.csv
+        selecionar(numfeats)
+        # selecionar(numfeats) = Seleciona int(numfeats) e gera o arquivo features.csv
 
     feats = None
 
@@ -105,6 +113,8 @@ def classificador(novos_dados: bool = False):
     with open('features.csv', 'r') as arqcsv:
         feats = reader(arqcsv, delimiter=',')
         feats = [c for c in feats][0]
+        feats.append('Score Titulo')
+        feats.append('Score Body')
         for site in gSL:
             m = []
             treino = pd.DataFrame()
@@ -119,7 +129,8 @@ def classificador(novos_dados: bool = False):
                     if exists('./minerados/db/{}/{}.html'.format(site, a)):
                         with open('./minerados/db/{}/{}.html'.format(site, a), 'r') as arqhtml:
                             sopa = BeautifulSoup(arqhtml, 'html.parser')
-                            m.append(minerador(sopa, feats))
+                            k = minerador(sopa, feats)
+                            m.append(k)
                 
                 treino = pd.DataFrame(data = m, columns = feats)
 
@@ -164,49 +175,38 @@ def classificador(novos_dados: bool = False):
                     print('Arquivo mil não encontrado, tente rodar com o parâmetro novos_dados = True')
                     exit()
 
-            df = None
-
-            # classificadores = ['Naive Bayes', 'Decision Tree', 'Multi Layer Perceptron', 'SVC', 'Regressao Logistica']
-            # classificadores['Naive Bayes']
             df = pd.DataFrame(list(mil.values()), columns = feats)
-            
-            # for c in classificadores:
-            #     if not exists('./minerados/mil/{}/{}'.format(site, c)):
-            #         with open('./minerados/mil/{}/{}'.format(site, c), 'wb') as arqdados:
-            #             pickle.dump(df, arqdados)
-            #     else:
-            #         with open('./minerados/mil/{}/{}'.format(site, c), 'rb') as arqdados:
-            #             df = arqdados.load(arqdados)
-                        
+
             # Juntar dataframes treino e df caso seja necessário:
             # print(treino.append(df,ignore_index=True))
 
             # print(df.head())
-            gnb, dtc, mlp, svc, lgr = GaussianNB(), DecisionTreeClassifier(), MLPClassifier(), SVC(), LogisticRegression()
+            # gnb, dtc, mlp, svc, lgr = GaussianNB(), DecisionTreeClassifier(), MLPClassifier(), SVC(), LogisticRegression()
 
-            gnb.fit(treino, [1]*10+[0]*10)
+            gnb = GaussianNB()
+            gnb.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
             result = gnb.predict(X=df)
             score = gnb.score(X=df, y = result)
             print('Resultado Naive Bayes: \n', result)
 
-            dtc.fit(treino, [1]*10+[0]*10)
-            result = dtc.predict(X=df)
-            score = dtc.score(X=df, y = result)
-            print('Resultado Decision Tree: \n', result)
+            # dtc.fit(treino, [1]*10+[0]*10)
+            # result = dtc.predict(X=df)
+            # score = dtc.score(X=df, y = result)
+            # print('Resultado Decision Tree: \n', result)
 
-            mlp.fit(treino, [1]*10+[0]*10)
-            result = mlp.predict(X=df)
-            score = mlp.score(X=df, y = result)
-            print('Resultado Multi-layer Perceptron: \n', result)
+            # mlp.fit(treino, [1]*10+[0]*10)
+            # result = mlp.predict(X=df)
+            # score = mlp.score(X=df, y = result)
+            # print('Resultado Multi-layer Perceptron: \n', result)
 
-            svc.fit(treino, [1]*10+[0]*10)
-            result = svc.predict(X=df)
-            score = svc.score(X=df, y = result)
-            print('Resultado SVC: \n', result)
+            # svc.fit(treino, [1]*10+[0]*10)
+            # result = svc.predict(X=df)
+            # score = svc.score(X=df, y = result)
+            # print('Resultado SVC: \n', result)
 
-            lgr.fit(treino, [1]*10+[0]*10)
-            result = lgr.predict(X=df)
-            score = lgr.score(X=df, y = result)
-            print('Resultado Logistic Regression: \n', result)
+            # lgr.fit(treino, [1]*10+[0]*10)
+            # result = lgr.predict(X=df)
+            # score = lgr.score(X=df, y = result)
+            # print('Resultado Logistic Regression: \n', result)
 
 classificador(novos_dados=False)

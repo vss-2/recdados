@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from csv import reader
 from getRecDados import getPalavrasRem, getSitesLista
 from unicodedata import normalize
+from random import shuffle
 import zipfile
 
 def featureSelection(posneg: str = 'pos', contar: bool = False):
@@ -81,33 +82,43 @@ def featureSelecionadas(n: int = 10, contar: bool = False) -> list:
         leitor = reader(arqcsv, delimiter='\n')
         if contar:
             topfeats = [(l[0].split(': ')[0], int(l[0].split(': ')[1])) for l in leitor]
-            topfeats.sort(key=lambda x: x[1])
+            topfeats.sort(key=lambda x: x[1], reverse=True)
+            return topfeats[:n]
         else:
             topfeats = [l[0].split(': ')[0] for l in leitor]
+            shuffle(topfeats)
         # print(topfeats)
         # print(topfeats[-n:])
-    return topfeats[-n:]
+    return topfeats[:n]
 
-def selecionar():
+def selecionar(numfeats: int = 9):
     with open('features.csv', 'w') as arqcsv:
         repetido = []
 
         featureSelection('pos', True)
-        f = featureSelecionadas(10, True)
+        f = featureSelecionadas(numfeats*2, True)
+        # print(f)
         for x in f:
             repetido.append(x[0])
             arqcsv.write(str(x[0])+',')
+            if len(repetido)>numfeats:
+                break
 
         featureSelection('neg', True)
-        f = featureSelecionadas(10, True)
-        
+        f = featureSelecionadas(numfeats*2, True)
+        # print(f)
         f = [v[0] for v in f]
         for r in repetido:
             if r in f:
                 f.remove(r)
 
+        # uhd,wi,fi,4k,usb,hdmi,hd,led,smart,tv,box,preto,suporte,controle,remoto,digital,antena
+
         for x in f:
-            if f.index(x) < len(f)-1:
+            if f.index(x) < numfeats:
                 arqcsv.write(str(x)+',')
             else:
                 arqcsv.write(str(x))
+                break
+
+selecionar()
