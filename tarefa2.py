@@ -12,7 +12,7 @@ from os.path import exists
 from feature_selection import selecionar
 from bs4 import BeautifulSoup
 import pandas as pd
-
+import numpy as np
 def minerador(sopa, feats):
     tags_rm = getTagsRem()
     
@@ -104,24 +104,30 @@ def main():
                     m.append(minerador(sopa, feats))
         
         # Coluna SIM/NAO identifica se é realmente um televisor
-        for index, v in enumerate(m):
-            if index>9:
-                v.append(0)
-            else:
-                v.append(1)
+        # for index, v in enumerate(m):
+        #     if index>9:
+        #         v.append(0)
+        #     else:
+        #         v.append(1)
+        # feats.append('SIM/NAO')
 
-        feats.append('SIM/NAO')
-        df = pd.DataFrame(data=m, columns=feats)
-        print(df.head(20))
+        treino = pd.DataFrame(data = m, columns = feats)
+
+        mil = dict()
+        for a in range(1, 1000):
+            if exists('./minerados/mil/ricardoeletro/{}.html'.format(a)):
+                with open('./minerados/mil/ricardoeletro/{}.html'.format(a), 'r') as arqhtml2:
+                    sopa = BeautifulSoup(arqhtml2, 'html.parser')
+                    k = minerador(sopa, feats)
+                    mil.update({len(mil)+len(m):k})
+                    # print({len(mil)+len(m):k})
         
-        # mil = dict()
-        # for a in range(1, 1000):
-        #     if exists('./minerados/mil/ricardoeletro/{}.html'.format(a)):
-        #         with open('./minerados/mil/ricardoeletro/{}.html'.format(a), 'r') as arqhtml2:
-        #             sopa = BeautifulSoup(arqhtml2, 'html.parser')
-        #             mil.update({len(mil)+len(m):minerador(sopa, feats)})
-        
-        # df += pd.DataFrame(mil)
-        # print(df.head(50))
+        df = pd.DataFrame(list(mil.values()), columns = feats)
+        # print(treino.append(df,ignore_index=True))
+
+        gnb = GaussianNB()
+        gnb.fit(treino, [1]*10+[0]*10)
+        print(df.head())
+        print(gnb.predict(X=df))
 
 main()
