@@ -71,9 +71,18 @@ def main():
         for k in linkslist:
             count = 0
             sitelinks = []
-            sitelinks.append(k)
-            while (count < 10 or len(sitelinks)>= count):  
-                driver.get(sitelinks.pop(0))
+            sitelinks.append((k,1))
+            while (count < 10 or len(sitelinks)>= count):
+                aux = sitelinks.pop(0)[0]  
+                print(aux)
+                driver.get(aux)
+                for f in range(randint(3, 13)):
+                    if f%2 == 1:
+                        driver.execute_script("if(document.body.scrollHeight) { window.scrollTo(0,(document.body.scrollHeight/"+str(f)+")) }")                        
+                        sleep(0.4)
+                    else:
+                        driver.execute_script("if(document.body.scrollHeight) { window.scrollTo(0,(document.body.scrollHeight/"+str(f)+")) }")
+                        sleep(0.2)
                 page = driver.page_source
                 if not exists('./minerados/db/{}.html'.format(count+1000*(linkslist.index(k)))):
                     with open('./minerados/db/{}.html'.format(count+1000*(linkslist.index(k))), 'w') as arqhtml:
@@ -95,14 +104,9 @@ def main():
                         if filter(strlink, k, robotstxt[k]["disallow"] ):
                             if strlink not in sitelinks:
                                 if strlink[0:5] == "https":
-                                    sitelinks.append(strlink)
-                for f in range(randint(3, 13)):
-                    if f%2 == 1:
-                        driver.execute_script("if(document.body.scrollHeight) { window.scrollTo(0,(document.body.scrollHeight/"+str(f)+")) }")                        
-                        sleep(0.4)
-                    else:
-                        driver.execute_script("if(document.body.scrollHeight) { window.scrollTo(0,(document.body.scrollHeight/"+str(f)+")) }")
-                        sleep(0.2)
+                                    aux = pondlink[1]
+                                    sitelinks.append((strlink, aux))
+                                    sitelinks = sorted(sitelinks, key=lambda x:x[1], reverse=True)
                 sleep(12)
                 count += 1  
             visitedlist.append(sitelinks)
