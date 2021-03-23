@@ -4,7 +4,7 @@ from getRecDados import getBagOfWords
 def classificador(texto: str = '') -> int:
     if texto == '':
         return 0
-
+    
     texto = texto.casefold()
 
     for x in ['-', '_', ',', '/']:
@@ -20,12 +20,12 @@ def classificador(texto: str = '') -> int:
     for b in bow:
         if b in texto_sp:
             score *= 2
-
+    if(score > 1):
+        print(texto_sp, score)
     try:
         # Removendo polegadas pela expressão regular
         valor = re.search('[0-9]{2}', texto)
         # print(valor, splsep, link_bkp)
-        print(valor.regs)
         if(valor.regs):
             # print(str(link_bkp[valor.regs[0][0]+1:valor.regs[0][1]-1]))
             # print(link)
