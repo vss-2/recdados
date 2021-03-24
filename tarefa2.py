@@ -3,7 +3,7 @@ from numpy.random import shuffle
 from getRecDados import getRotulos, getTagsRem, getPalavrasRem, getSitesLista
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
@@ -12,12 +12,13 @@ from os.path import exists
 from feature_selection import selecionar
 from bs4 import BeautifulSoup
 from sklearn.metrics import accuracy_score, f1_score
-# import mlflow
+import mlflow
 import pandas as pd
 import numpy as np
 import pickle
 
 def minerador(sopa, feats):
+    # Implementação do TF-IDF
     tags_rm = getTagsRem()
     
     for t in tags_rm:
@@ -28,6 +29,7 @@ def minerador(sopa, feats):
     bingo = [0]*len(feats)
     score_titulo = 0
     score_body = 0
+    titulo = ''
 
     # Tentar pegar informação do título
     try:
@@ -80,7 +82,12 @@ def minerador(sopa, feats):
         print(e)
         pass
 
-    titulo = list(filter(lambda x: x not in getPalavrasRem(), titulo))
+    try:
+        titulo = list(filter(lambda x: x not in getPalavrasRem(), titulo))
+    except Exception as e:
+        # print(e)
+        pass
+    
     dados = list(filter(lambda x: x not in getPalavrasRem(), dados))
 
     for index, f in enumerate(feats, 0):
@@ -90,15 +97,12 @@ def minerador(sopa, feats):
             else:
                 score_body += dados.count(f)
 
-    # print(bingo, soma)
-    # print(titulo, dados)
-
     bingo[-2] = score_titulo
     bingo[-1] = score_body
 
     return bingo
 
-def classificador(novos_dados: bool = False):
+def classificador(novos_dados: bool = False, heuristica: bool = False):
     numfeats = 9
     if novos_dados or not exists('./features.csv'):
         novos_dados = True
@@ -107,8 +111,13 @@ def classificador(novos_dados: bool = False):
 
     feats = None
 
+    if heuristica:
+        pasta = 'heuristica'
+    else:
+        pasta = 'baseline'
+
     # gSL = getSitesLista()
-    gSL = ['ricardoeletro']
+    gSL = ['ricardoeletro','magazineluiza','colombo','havan','carrefour','amazon','mercadolivre']
 
     with open('features.csv', 'r') as arqcsv:
         feats = reader(arqcsv, delimiter=',')
@@ -116,6 +125,7 @@ def classificador(novos_dados: bool = False):
         feats.append('Score Titulo')
         feats.append('Score Body')
         for site in gSL:
+            print(site)
             m = []
             treino = pd.DataFrame()
             mil = dict()
@@ -134,20 +144,20 @@ def classificador(novos_dados: bool = False):
                 
                 treino = pd.DataFrame(data = m, columns = feats)
 
-                with open('./minerados/mil/{}/treino'.format(site), 'wb') as arqdados:
+                with open('./minerados/mil/{}/{}/treino'.format(pasta, site), 'wb') as arqdados:
                     pickle.dump(treino, arqdados)
 
-                with open('./minerados/mil/{}/m'.format(site), 'wb') as arqdados:
+                with open('./minerados/mil/{}/{}/m'.format(pasta, site), 'wb') as arqdados:
                     pickle.dump(m, arqdados)
 
             else:
                 
-                if exists('./minerados/mil/{}/treino'.format(site)):
-                    with open('./minerados/mil/{}/treino'.format(site), 'rb') as arqdados:
+                if exists('./minerados/mil/{}/{}/treino'.format(pasta, site)):
+                    with open('./minerados/mil/{}/{}/treino'.format(pasta, site), 'rb') as arqdados:
                         treino = pickle.load(arqdados)
 
-                if exists('./minerados/mil/{}/m'.format(site)):
-                    with open('./minerados/mil/ricardoeletro/m', 'rb') as arqdados:
+                if exists('./minerados/mil/{}/{}/m'.format(pasta, site)):
+                    with open('./minerados/mil/{}/{}/m'.format(pasta, site), 'rb') as arqdados:
                         m = pickle.load(arqdados)
 
                 else:
@@ -155,21 +165,29 @@ def classificador(novos_dados: bool = False):
                     exit()
 
             if novos_dados:
-                
-                # Lê os 1000 htmls da loja específica
-                for a in range(1, 1000):
-                    if exists('./minerados/mil/{}/{}.html'.format(site, a)):
-                        with open('./minerados/mil/{}/{}.html'.format(site, a), 'r') as arqhtml2:
-                            sopa = BeautifulSoup(arqhtml2, 'html.parser')
-                            k = minerador(sopa, feats)
-                            mil.update({len(mil)+len(m):k})
+                    
+                if exists('./minerados/mil/{}/{}/1010.html'.format(pasta, site)):
+                    for a in range(1001, 2000):
+                        if exists('./minerados/mil/{}/{}/{}.html'.format(pasta, site, a)):
+                            with open('./minerados/mil/{}/{}/{}.html'.format(pasta, site, a), 'r') as arqhtml2:
+                                sopa = BeautifulSoup(arqhtml2, 'html.parser')
+                                k = minerador(sopa, feats)
+                                mil.update({len(mil)+len(m):k})
+                else:
+                    # Lê os 1000 htmls da loja específica
+                    for a in range(1, 1000):
+                        if exists('./minerados/mil/{}/{}/{}.html'.format(pasta, site, a)):
+                            with open('./minerados/mil/{}/{}/{}.html'.format(pasta, site, a), 'r') as arqhtml2:
+                                sopa = BeautifulSoup(arqhtml2, 'html.parser')
+                                k = minerador(sopa, feats)
+                                mil.update({len(mil)+len(m):k})
 
-                with open('./minerados/mil/{}/mil'.format(site), 'wb') as arqdados:
+                with open('./minerados/mil/{}/{}/mil'.format(pasta, site), 'wb') as arqdados:
                     pickle.dump(mil, arqdados)
 
             else:
-                if exists('./minerados/mil/{}/mil'.format(site)):
-                    with open('./minerados/mil/{}/mil'.format(site), 'rb') as arqdados:
+                if exists('./minerados/mil/{}/{}/mil'.format(pasta, site)):
+                    with open('./minerados/mil/{}/{}/mil'.format(pasta, site), 'rb') as arqdados:
                         mil = pickle.load(arqdados)
                 else:
                     print('Arquivo mil não encontrado, tente rodar com o parâmetro novos_dados = True')
@@ -179,34 +197,66 @@ def classificador(novos_dados: bool = False):
 
             # Juntar dataframes treino e df caso seja necessário:
             # print(treino.append(df,ignore_index=True))
-
             # print(df.head())
-            # gnb, dtc, mlp, svc, lgr = GaussianNB(), DecisionTreeClassifier(), MLPClassifier(), SVC(), LogisticRegression()
+
+            gnb, rfc, mlp, svc, lgr = GaussianNB(), RandomForestClassifier(), MLPClassifier(), SVC(), LogisticRegression()
 
             gnb = GaussianNB()
             gnb.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
             result = gnb.predict(X=df)
-            score = gnb.score(X=df, y = result)
+            score = gnb.score(X=df, y=result)
+            with open('./minerados/mil/{}/{}/gnb'.format(pasta, site), 'wb') as arqdados:
+                pickle.dump(result, arqdados)
             print('Resultado Naive Bayes: \n', result)
 
-            # dtc.fit(treino, [1]*10+[0]*10)
-            # result = dtc.predict(X=df)
-            # score = dtc.score(X=df, y = result)
-            # print('Resultado Decision Tree: \n', result)
+            rfc.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
+            result = rfc.predict(X=df)
+            score = rfc.score(X=df, y=result)
+            with open('./minerados/mil/{}/{}/rfc'.format(pasta, site), 'wb') as arqdados:
+                pickle.dump(result, arqdados)
+            print('Resultado Random Forest Classifier: \n', result)
 
-            # mlp.fit(treino, [1]*10+[0]*10)
-            # result = mlp.predict(X=df)
-            # score = mlp.score(X=df, y = result)
-            # print('Resultado Multi-layer Perceptron: \n', result)
+            mlp.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
+            result = mlp.predict(X=df)
+            score = mlp.score(X=df, y=result)
+            with open('./minerados/mil/{}/{}/mlp'.format(pasta, site), 'wb') as arqdados:
+                pickle.dump(result, arqdados)
+            print('Resultado Multi-layer Perceptron: \n', result)
 
-            # svc.fit(treino, [1]*10+[0]*10)
-            # result = svc.predict(X=df)
-            # score = svc.score(X=df, y = result)
-            # print('Resultado SVC: \n', result)
+            svc.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
+            result = svc.predict(X=df)
+            score = svc.score(X=df, y=result)
+            with open('./minerados/mil/{}/{}/svc'.format(pasta, site), 'wb') as arqdados:
+                pickle.dump(result, arqdados)
+            print('Resultado SVC: \n', result)
 
-            # lgr.fit(treino, [1]*10+[0]*10)
-            # result = lgr.predict(X=df)
-            # score = lgr.score(X=df, y = result)
-            # print('Resultado Logistic Regression: \n', result)
+            lgr.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
+            result = lgr.predict(X=df)
+            score = lgr.score(X=df, y=result)
+            with open('./minerados/mil/{}/{}/lgr'.format(pasta, site), 'wb') as arqdados:
+                pickle.dump(result, arqdados)
+            print('Resultado Logistic Regression: \n', result)
 
-classificador(novos_dados=False)
+# classificador(novos_dados=True, heuristica=False)
+
+def classificadorCompleto():
+    gSL = ['ricardoeletro','magazineluiza','colombo','havan','carrefour','amazon','mercadolivre']
+    resultadoCompleto = []
+    pasta = 'baseline'
+    for site in gSL:
+        try:
+            classificadores = ['gnb', 'rfc', 'mlp', 'svc', 'lgr']
+            for c in classificadores:
+                with open('./minerados/mil/{}/{}/{}'.format(pasta, site, c), 'rb') as arqdados:
+                    l = pickle.load(arqdados)
+                    resultadoCompleto.append(l)
+        except Exception as e:
+            continue
+    # for rC in resultadoCompleto:
+        # print(rC)
+
+classificadorCompleto()
+
+# https://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html
+# https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html
+# https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html
