@@ -12,8 +12,8 @@ def getTagsRem() -> list:
     return ['script', 'style', 'noscript', 'img', 'input', 'br', 'option', 'form', 'polygon', 'svg']
 
 def getSitesLista() -> list:
-    return ['amazon', 'mercadolivre', 'casasbahia', 'americanas', 'magazineluiza', 
-        'havan', 'gazin', 'extra', 'submarino', 'ricardoeletro', 'carrefour', 'colombo'] 
+    return ['amazon', 'mercadolivre', 'kabum', 'magazineluiza', 
+        'havan', 'nagem', 'lasereletro', 'ricardoeletro', 'carrefour', 'colombo'] 
 
 def getPalavrasRem(remPol: bool = True) -> set:
     # Palavras removidas
