@@ -17,7 +17,7 @@ def getSitesLista() -> list:
 
 def getPalavrasRem(remPol: bool = True) -> set:
     # Palavras removidas
-    s = set({'', ' ', 'a', 'à', 'e', 'in', 'sem', 'com', 'de', 'do', 'da', 'para', 'casas bahia', 'casas', 'bahia', 'amazon',
+    s = set({'', '=', ' ', 'a', 'à', 'e', 'in', 'sem', 'com', 'de', 'do', 'da', 'para', 'casas bahia', 'casas', 'bahia', 'amazon',
     'no', 'na', 'nos', 'nas', 'novo', 'nova', 'americanas', 'carrefour', 'casasbahia', 'colombo', 'extra', 'br', 'em', 'até',
     'gazin', 'havan', 'magazine', 'magazineluiza', 'luiza', 'mercado', 'mercadolivre', 'livre', 'ricardo eletro', 'submarino',
     'ricardo', 'eletro', 'carrinho', 'login'})
@@ -61,13 +61,11 @@ def getRobots(s:str) -> list:
     link = {
         'amazon.com.br': '',
         'mercadolivre.com.br': '',
-        'casasbahia.com.br': '',
-        'americanas.com.br': '',
+        'kabum.com.br': '',
         'magazineluiza.com.br': '',
         'havan.com.br': '',
-        'gazin.com.br': '',
-        'extra.com.br': '',
-        'submarino.com.br': '',
+        'nagem.com.br': '',
+        'lasereletro.com.br': '',
         'ricardoeletro.com.br': '',
         'carrefour.com.br': '',
         'colombo.com.br': ''

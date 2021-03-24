@@ -18,7 +18,7 @@ def featureSelection(posneg: str = 'pos', contar: bool = False):
     for s in sites:
         for n in range(nstart, nend):
             try:
-                sopa = BeautifulSoup(open('/home/vitor/Github/recdados/minerados/db/{}/{}.html'.format(s, n)).read(), features='html.parser')
+                sopa = BeautifulSoup(open('./minerados/db/{}/{}.html'.format(s, n)).read(), features='html.parser')
             except FileNotFoundError:
                 try: 
                     with zipfile.ZipFile('./10_sites_de_cada_exemplo.zip', 'r') as arqzip:
@@ -43,6 +43,8 @@ def featureSelection(posneg: str = 'pos', contar: bool = False):
                         titulo = titulo.replace(':', ' ')
                     if('+' in titulo):
                         titulo = titulo.replace('+', ' ')
+                    if('=' in titulo):
+                        titulo = titulo.replace('=', ' ')
                     
                     titulo = titulo.casefold().split(' ')
 
@@ -111,8 +113,6 @@ def selecionar(numfeats: int = 9):
         for r in repetido:
             if r in f:
                 f.remove(r)
-
-        # uhd,wi,fi,4k,usb,hdmi,hd,led,smart,tv,box,preto,suporte,controle,remoto,digital,antena
 
         for x in f:
             if f.index(x) < numfeats:

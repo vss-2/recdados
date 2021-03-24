@@ -125,7 +125,7 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
         feats.append('Score Titulo')
         feats.append('Score Body')
         for site in gSL:
-            print(site)
+            print('Executando classificador para:', site)
             m = []
             treino = pd.DataFrame()
             mil = dict()
@@ -207,37 +207,37 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
             score = gnb.score(X=df, y=result)
             with open('./minerados/mil/{}/{}/gnb'.format(pasta, site), 'wb') as arqdados:
                 pickle.dump(result, arqdados)
-            print('Resultado Naive Bayes: \n', result)
+            # print('Resultado Naive Bayes: \n', result)
 
             rfc.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
             result = rfc.predict(X=df)
             score = rfc.score(X=df, y=result)
             with open('./minerados/mil/{}/{}/rfc'.format(pasta, site), 'wb') as arqdados:
                 pickle.dump(result, arqdados)
-            print('Resultado Random Forest Classifier: \n', result)
+            # print('Resultado Random Forest Classifier: \n', result)
 
             mlp.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
             result = mlp.predict(X=df)
             score = mlp.score(X=df, y=result)
             with open('./minerados/mil/{}/{}/mlp'.format(pasta, site), 'wb') as arqdados:
                 pickle.dump(result, arqdados)
-            print('Resultado Multi-layer Perceptron: \n', result)
+            # print('Resultado Multi-layer Perceptron: \n', result)
 
             svc.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
             result = svc.predict(X=df)
             score = svc.score(X=df, y=result)
             with open('./minerados/mil/{}/{}/svc'.format(pasta, site), 'wb') as arqdados:
                 pickle.dump(result, arqdados)
-            print('Resultado SVC: \n', result)
+            # print('Resultado SVC: \n', result)
 
             lgr.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
             result = lgr.predict(X=df)
             score = lgr.score(X=df, y=result)
             with open('./minerados/mil/{}/{}/lgr'.format(pasta, site), 'wb') as arqdados:
                 pickle.dump(result, arqdados)
-            print('Resultado Logistic Regression: \n', result)
+            # print('Resultado Logistic Regression: \n', result)
 
-# classificador(novos_dados=True, heuristica=False)
+classificador(novos_dados=True, heuristica=False)
 
 def classificadorCompleto():
     gSL = ['ricardoeletro','magazineluiza','colombo','havan','carrefour','amazon','mercadolivre']
