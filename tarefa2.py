@@ -10,12 +10,18 @@ from sklearn.linear_model import LogisticRegression
 from csv import reader
 from os.path import exists
 from feature_selection import selecionar
+
 from bs4 import BeautifulSoup
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score, average_precision_score
+from sklearn.model_selection import train_test_split
+from timeit import default_timer as timer
+import warnings
 import mlflow
 import pandas as pd
 import numpy as np
 import pickle
+
+warnings.filterwarnings("ignore")
 
 def minerador(sopa, feats):
     # Implementação do TF-IDF
@@ -67,7 +73,7 @@ def minerador(sopa, feats):
                         bingo[index] = 1
             
     except Exception as e:
-        print(e)
+        # print('Houve um problema no minerador() durante a avaliacao do score do titulo')
         pass
 
     # Tentar pegar informação de qualquer outro campo textual
@@ -77,15 +83,16 @@ def minerador(sopa, feats):
             try:
                 dados.append(ts.getText().casefold().strip())
             except Exception as e:
-                print(e)
+                # print('Houve um problema no minerador() durante a insercao de palavras do body')
+                pass
     except Exception as e:
-        print(e)
+        # print('Houve um problema no minerador() durante a coleta de campos textuais vindo das tags')
         pass
 
     try:
         titulo = list(filter(lambda x: x not in getPalavrasRem(), titulo))
     except Exception as e:
-        # print(e)
+        # print('Houve um problema no minerador() durante a remocao de palavras do titulo')
         pass
     
     dados = list(filter(lambda x: x not in getPalavrasRem(), dados))
@@ -116,22 +123,23 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
     else:
         pasta = 'baseline'
 
-    # gSL = getSitesLista()
-    gSL = ['ricardoeletro','magazineluiza','colombo','havan','carrefour','amazon','mercadolivre']
+    gSL = getSitesLista()
 
     with open('features.csv', 'r') as arqcsv:
+        
         feats = reader(arqcsv, delimiter=',')
         feats = [c for c in feats][0]
         feats.append('Score Titulo')
         feats.append('Score Body')
+
         for site in gSL:
-            print('Executando classificador para:', site)
+            tempo_inicial = timer()
+            print('Executando classificador com partição de rótulos para:', site.capitalize())
             m = []
+            m_geral = [[],[]]
             treino = pd.DataFrame()
             mil = dict()
-            
-            # Renomear todos os cantos onde está ricardoeletro
-            
+                        
             if novos_dados:
                 # Lê os treinos da loja específica
                 
@@ -164,6 +172,68 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
                     print('Arquivo treino ou m não encontrado, tente rodar com o parâmetro novos_dados = True')
                     exit()
 
+            # df = pd.DataFrame(list(mil.values()), columns = feats)
+
+            um_zero = [1]*(numfeats+1) + [0]*(numfeats+1)
+
+            m_geral[0].extend(m)
+            m_geral[1].extend(um_zero)
+            
+            X_treino, X_teste, y_treino, y_teste = train_test_split(m, um_zero, test_size=0.25, random_state=len(m)//2)
+
+            # Juntar dataframes treino e df caso seja necessário:
+            # print(treino.append(df,ignore_index=True))
+            # print(df.head())
+
+            gnb, rfc, mlp, svc, lgr = GaussianNB(), RandomForestClassifier(), MLPClassifier(), SVC(), LogisticRegression()
+
+            gnb.fit(X_treino, y_treino)
+            result = gnb.predict(X=X_teste)
+            score = gnb.score(X=X_teste, y=y_teste)
+            with open('./minerados/mil/{}/{}/gnb'.format(pasta, site), 'wb') as arqdados:
+                pickle.dump(result, arqdados)
+            print('Precision-Recall, F-Score e Acurácia Naive Bayes: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+
+            rfc.fit(X_treino, y_treino)
+            result = rfc.predict(X=X_teste)
+            score = rfc.score(X=X_teste, y=y_teste)
+            with open('./minerados/mil/{}/{}/rfc'.format(pasta, site), 'wb') as arqdados:
+                pickle.dump(result, arqdados)
+            print('Precision-Recall, F-Score e Acurácia Random Forest Classifier: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+
+            mlp.fit(X_treino, y_treino)
+            result = mlp.predict(X=X_teste)
+            score = mlp.score(X=X_teste, y=y_teste)
+            with open('./minerados/mil/{}/{}/mlp'.format(pasta, site), 'wb') as arqdados:
+                pickle.dump(result, arqdados)
+            print('Precision-Recall, F-Score e Acurácia Multi-layer Perceptron: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+
+            svc.fit(X_treino, y_treino)
+            result = svc.predict(X=X_teste)
+            score = svc.score(X=X_teste, y=y_teste)
+            with open('./minerados/mil/{}/{}/svc'.format(pasta, site), 'wb') as arqdados:
+                pickle.dump(result, arqdados)
+            print('Precision-Recall, F-Score e Acurácia SVC: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+
+            lgr.fit(X_treino, y_treino)
+            result = lgr.predict(X=X_teste)
+            score = lgr.score(X=X_teste, y=y_teste)
+            with open('./minerados/mil/{}/{}/lgr'.format(pasta, site), 'wb') as arqdados:
+                pickle.dump(result, arqdados)
+            print('Precision-Recall, F-Score e Acurácia Logistic Regression: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+
+            print('Tempo gasto para', site.capitalize(), timer()-tempo_inicial, '\n')
+        
+
+        # Recebendo os 200 rótulos
+        X_treino, y_treino = m_geral[0], m_geral[1]
+
+        dez_mil = []
+
+        for site in gSL:
+            
+            mil = dict()
+
             if novos_dados:
                     
                 if exists('./minerados/mil/{}/{}/1010.html'.format(pasta, site)):
@@ -173,6 +243,7 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
                                 sopa = BeautifulSoup(arqhtml2, 'html.parser')
                                 k = minerador(sopa, feats)
                                 mil.update({len(mil)+len(m):k})
+                                dez_mil.append(k)
                 else:
                     # Lê os 1000 htmls da loja específica
                     for a in range(1, 1000):
@@ -181,68 +252,99 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
                                 sopa = BeautifulSoup(arqhtml2, 'html.parser')
                                 k = minerador(sopa, feats)
                                 mil.update({len(mil)+len(m):k})
+                                dez_mil.append(k)
 
                 with open('./minerados/mil/{}/{}/mil'.format(pasta, site), 'wb') as arqdados:
                     pickle.dump(mil, arqdados)
+                
+                with open('./minerados/mil/dez_mil', 'wb') as arqdados:
+                    pickle.dump(dez_mil, arqdados)
 
             else:
                 if exists('./minerados/mil/{}/{}/mil'.format(pasta, site)):
                     with open('./minerados/mil/{}/{}/mil'.format(pasta, site), 'rb') as arqdados:
-                        mil = pickle.load(arqdados)
+                        mil = pickle.load(arqdados)                
                 else:
                     print('Arquivo mil não encontrado, tente rodar com o parâmetro novos_dados = True')
                     exit()
+                
+                if exists('./minerados/mil/dez_mil'):
+                    with open('./minerados/mil/dez_mil', 'rb') as arqdados:
+                        dez_mil = pickle.load(arqdados)                
+                else:
+                    print('Arquivo dez_mil não encontrado, tente rodar com o parâmetro novos_dados = True')
+                    exit()
 
-            df = pd.DataFrame(list(mil.values()), columns = feats)
-
-            # Juntar dataframes treino e df caso seja necessário:
-            # print(treino.append(df,ignore_index=True))
-            # print(df.head())
+            tempo_inicial = timer()
+            
+            # Recebendo os 1000 htmls
+            X_teste = mil.values()
 
             gnb, rfc, mlp, svc, lgr = GaussianNB(), RandomForestClassifier(), MLPClassifier(), SVC(), LogisticRegression()
+            harvest = [0,0,0,0,0]
 
-            gnb = GaussianNB()
-            gnb.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
-            result = gnb.predict(X=df)
-            score = gnb.score(X=df, y=result)
-            with open('./minerados/mil/{}/{}/gnb'.format(pasta, site), 'wb') as arqdados:
-                pickle.dump(result, arqdados)
-            # print('Resultado Naive Bayes: \n', result)
+            for tst in X_teste:
+                gnb.fit(X_treino, y_treino)
+                result = gnb.predict(X=[tst])
+                harvest[0] += result[0]
 
-            rfc.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
-            result = rfc.predict(X=df)
-            score = rfc.score(X=df, y=result)
-            with open('./minerados/mil/{}/{}/rfc'.format(pasta, site), 'wb') as arqdados:
-                pickle.dump(result, arqdados)
-            # print('Resultado Random Forest Classifier: \n', result)
+                rfc.fit(X_treino, y_treino)
+                result = rfc.predict(X=[tst])
+                harvest[1] += result[0]
 
-            mlp.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
-            result = mlp.predict(X=df)
-            score = mlp.score(X=df, y=result)
-            with open('./minerados/mil/{}/{}/mlp'.format(pasta, site), 'wb') as arqdados:
-                pickle.dump(result, arqdados)
-            # print('Resultado Multi-layer Perceptron: \n', result)
+                mlp.fit(X_treino, y_treino)
+                result = mlp.predict(X=[tst])
+                harvest[2] += result[0]
 
-            svc.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
-            result = svc.predict(X=df)
-            score = svc.score(X=df, y=result)
-            with open('./minerados/mil/{}/{}/svc'.format(pasta, site), 'wb') as arqdados:
-                pickle.dump(result, arqdados)
-            # print('Resultado SVC: \n', result)
+                svc.fit(X_treino, y_treino)
+                result = svc.predict(X=[tst])
+                harvest[3] += result[0]
 
-            lgr.fit(treino, [1]*(numfeats+1) + [0]*(numfeats+1))
-            result = lgr.predict(X=df)
-            score = lgr.score(X=df, y=result)
-            with open('./minerados/mil/{}/{}/lgr'.format(pasta, site), 'wb') as arqdados:
-                pickle.dump(result, arqdados)
-            # print('Resultado Logistic Regression: \n', result)
+                lgr.fit(X_treino, y_treino)
+                result = lgr.predict(X=[tst])
+                harvest[4] += result[0]
+            
+            print('Resultados Harvest usando 200 rótulos para os {} htmls de {} \nNaive Bayes: {} \nRandom Forest: {} \nMulti-layer Perceptron: {} \nSVC: {} \nLinear Regression: {}'.format(len(mil), site.capitalize(), harvest[0], harvest[1], harvest[2], harvest[3], harvest[4]))
+            print('Tempo gasto nos classificadores para', site.capitalize(), timer()-tempo_inicial, '\n')
+
+        tempo_inicial = timer()
+        
+        # Recebendo os 10000 htmls
+        X_teste = dez_mil.values()
+
+        gnb, rfc, mlp, svc, lgr = GaussianNB(), RandomForestClassifier(), MLPClassifier(), SVC(), LogisticRegression()
+        harvest = [0,0,0,0,0]
+
+        for tst in X_teste:
+            gnb.fit(X_treino, y_treino)
+            result = gnb.predict(X=[tst])
+            harvest[0] += result[0]
+
+            rfc.fit(X_treino, y_treino)
+            result = rfc.predict(X=[tst])
+            harvest[1] += result[0]
+
+            mlp.fit(X_treino, y_treino)
+            result = mlp.predict(X=[tst])
+            harvest[2] += result[0]
+
+            svc.fit(X_treino, y_treino)
+            result = svc.predict(X=[tst])
+            harvest[3] += result[0]
+
+            lgr.fit(X_treino, y_treino)
+            result = lgr.predict(X=[tst])
+            harvest[4] += result[0]
+        
+        print('Resultados Harvest usando 200 rótulos para {} htmls vindos de todos os sites \nNaive Bayes: {} \nRandom Forest: {} \nMulti-layer Perceptron: {} \nSVC: {} \nLinear Regression: {}'.format(len(dez_mil), harvest[0], harvest[1], harvest[2], harvest[3], harvest[4]))
+        print('Tempo gasto nos classificadores para avaliar todos os sites', timer()-tempo_inicial, '\n')
+        
 
 classificador(novos_dados=True, heuristica=False)
 
-def classificadorCompleto():
-    gSL = ['ricardoeletro','magazineluiza','colombo','havan','carrefour','amazon','mercadolivre']
+def classificadorCompleto(pasta: str = 'baseline'):
+    gSL = getSitesLista()
     resultadoCompleto = []
-    pasta = 'baseline'
     for site in gSL:
         try:
             classificadores = ['gnb', 'rfc', 'mlp', 'svc', 'lgr']
@@ -255,7 +357,7 @@ def classificadorCompleto():
     # for rC in resultadoCompleto:
         # print(rC)
 
-classificadorCompleto()
+# classificadorCompleto(pasta = 'baseline')
 
 # https://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html
 # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html
