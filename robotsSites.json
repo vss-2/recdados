@@ -106,51 +106,8 @@
                         "/*/jm/item",
                         "/recommendations-view",
                         "/org-img/html/",
-                        "/registration?confirmation_url*"
-                ]
-        },
-        "https://www.casasbahia.com.br" : {
-                "allow" : [
-                
-                ],
-                "disallow" : [
-                        "/site/",
-                        "/Site/",
-                        "/redirect/",
-                        "*strbusca=",
-                        "*strBusca=",
-                        "*ordenacao=",
-                        "*Ordenacao=",
-                        "carrinho",
-                        "basket",
-                        "checkout"
-                ]
-        },
-        "https://www.americanas.com.br" : {
-                "allow" : [
-                
-                ],
-                "disallow" : [
-                        "/avaliacao",
-                        "/parceiros",
-                        "/product-description",
-                        "/portal",
-                        "/garantia",
-                        "/estaticapop",
-                        "/search",
-                        "/incluir_prime",
-                        "/*cage.html",
-                        "*/g/*",
-                        "*/f/*",
-                        "*/m/*",
-                        "*/l/*",
-                        "*/c/*",
-                        "*/tag-imutavel*",
-                        "*/*filtro=*",
-                        "carrinho",
-                        "basket",
-                        "checkout",
-                        "*{\"id\":*{\"id\":*{\"id\":*{\"id\":*"
+                        "/registration?confirmation_url*",
+                        "login"
                 ]
         },
         "https://www.magazineluiza.com.br" : {
@@ -175,7 +132,8 @@
                         "/empresas",
                         "//luizacompany/",
                         "/filiais/",
-                        "/cliente/"
+                        "/cliente/",
+                        "denuncie"
                 ]
         },
         "https://www.havan.com.br" : {
@@ -200,7 +158,10 @@
                         "/Checkout/",
                         "/Content/Images/",
                         "/ControleAcessoExternoAPI/",
-                        "/loginnopassword/"
+                        "/loginnopassword/",
+                        "whatsapp",
+                        "facebook",
+                        "twitter"
                 ]
         },
         "https://www.gazin.com.br" : {
@@ -208,51 +169,12 @@
                 
                 ],
                 "disallow" : [
-
-                ]
-        },
-        "https://www.extra.com.br" : {
-                "allow" : [
-                
-                ],
-                "disallow" : [
-                        "/site/",
-                        "/Site/",
-                        "/redirect/",
-                        "*strbusca=",
-                        "*strBusca=",
-                        "*ordenacao=",
-                        "*Ordenacao=",
-                        "carrinho",
-                        "basket",
-                        "checkout"
-                ]
-        },
-        "https://www.submarino.com.br" : {
-                "allow" : [
-                
-                ],
-                "disallow" : [
-                        "/avaliacao",
-                        "/parceiros",
-                        "/product-description",
-                        "/portal",
-                        "/garantia",
-                        "/estaticapop",
-                        "/search",
-                        "/incluir_prime",
-                        "/*cage.html",
-                        "*/g/*",
-                        "*/f/*",
-                        "*/m/*",
-                        "*/l/*",
-                        "*/c/*",
-                        "*/tag-imutavel*",
-                        "*/*filtro=*",
-                        "carrinho",
-                        "basket",
-                        "checkout",
-                        "*{\"id\":*{\"id\":*{\"id\":*{\"id\":*"
+                        "api.",
+                        "whatsapp",
+                        "wa.me",
+                        "facebook",
+                        "twitter",
+                        "sharepoint"
                 ]
         },
         "https://www.ricardoeletro.com.br" : {
@@ -303,7 +225,46 @@
                         "*.pdf",
                         "appstatic.colombo.com.br*",
                         "appteste.colombo.com.br*",
-                        "/blog/"
+                        "/blog/",
+                        "produto-avaliacao",
+                        "produto-pergunta"
+                ]
+        },
+        "https://www.lasereletro.com.br" : {
+                "allow": [
+
+                ],
+                "disallow": [
+                         "/img/*", 
+                         "/account/*", 
+                         "/login/*",
+                         "/checkout/*", 
+                         "/busca/*", 
+                         "/quick-view/*", 
+                         "/espiar/*",
+                         "Sistema"
+                ]
+        },
+        "https://www.kabum.com.br" : {
+                "allow": [
+
+                ],
+                "disallow": [
+                        ".mp4",
+                        ".gif",
+                        ".ico",
+                        ".svg",
+                        ".pdf",
+                        ".jpg",
+                        ".zip",
+                         "/kabum3/ad/",
+                        "/kabum3/home/",
+                        "/manager/",
+                        "/*ordem",
+                        "whatsapp",
+                        "facebook",
+                        "twitter"
                 ]
         }
+
 }

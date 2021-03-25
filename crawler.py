@@ -9,37 +9,6 @@ from getRecDados import getBagOfWords, getTagsRem
 from random import randint
 from os.path import exists
 
-def heuristica(soup):
-    tags_rm = getTagsRem()
-    
-    for t in tags_rm:
-        for element in soup.findAll(t):
-            element.extract()
-
-    return
-
-def filtroGuiado(soup):
-    a_com_link = soup.findAll('a', href=True)
-    sitesAvisitar = []
-    bow_estatico = getBagOfWords()
-    
-    for acl in a_com_link:
-        for a in acl:
-            try:
-                k = a.find('span', href=False, recursive=True)
-                if k:
-                    for j in k:
-                        link_a_class = ' '.join(str(j).casefold().split())
-                        nota = classificador(link_a_class)
-                        link_real = k.findParent('a')['href']
-                        if nota > 1:
-                            sitesAvisitar.insert(0, (link_real, nota))
-            except Exception as e:
-                # print(e)
-                pass
-    # print(sitesAvisitar)
-    return
-
 def main():
     cs = None
     with open("robotsSites.json", "r") as read_file:
@@ -65,7 +34,7 @@ def main():
             count = 0
             sitelinks = []
             sitelinks.append(k)
-            while (count < 1000 or len(sitelinks)<= count):  
+            while (count < 1000 and len(sitelinks) > count):  
                 driver.get(sitelinks[count])
                 page = driver.page_source
                 if not exists('./minerados/db/{}.html'.format(count+1000*(linkslist.index(k)))):
@@ -88,13 +57,6 @@ def main():
                             if strlink not in sitelinks:
                                 if strlink[0:5] == "https":
                                     sitelinks.append(strlink)
-                for f in range(randint(3, 13)):
-                    if f%2 == 1:
-                        driver.execute_script("if(document.body.scrollHeight){ window.scrollTo(0,document.body.scrollHeight/{}) }".format(f))
-                        sleep(0.6)
-                    else:
-                        driver.execute_script("if(document.body.scrollHeight){ window.scrollTo(0,document.body.scrollHeight/{}) }".format(f))
-                        sleep(0.4)
                 # sleep(12)
                 count += 1  
             visitedlist.append(sitelinks)
