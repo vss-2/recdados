@@ -131,12 +131,14 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
         feats = [c for c in feats][0]
         feats.append('Score Titulo')
         feats.append('Score Body')
+        m_geral = [[],[]]
 
         for site in gSL:
-            tempo_inicial = timer()
-            print('Executando classificador com partição de rótulos para:', site.capitalize())
+            
+            # Teste de 5/20
+            # print('Executando classificador com partição de rótulos para:', site.capitalize())
+            
             m = []
-            m_geral = [[],[]]
             treino = pd.DataFrame()
             mil = dict()
                         
@@ -172,62 +174,101 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
                     print('Arquivo treino ou m não encontrado, tente rodar com o parâmetro novos_dados = True')
                     exit()
 
+
             # df = pd.DataFrame(list(mil.values()), columns = feats)
 
             um_zero = [1]*(numfeats+1) + [0]*(numfeats+1)
 
             m_geral[0].extend(m)
             m_geral[1].extend(um_zero)
-            
-            X_treino, X_teste, y_treino, y_teste = train_test_split(m, um_zero, test_size=0.25, random_state=len(m)//2)
+
+            with open('./minerados/mil/{}/m_geral'.format(pasta), 'wb') as arqdados:
+                pickle.dump(m_geral, arqdados)            
 
             # Juntar dataframes treino e df caso seja necessário:
             # print(treino.append(df,ignore_index=True))
             # print(df.head())
 
-            gnb, rfc, mlp, svc, lgr = GaussianNB(), RandomForestClassifier(), MLPClassifier(), SVC(), LogisticRegression()
+            # Teste de 5/20
+            # X_treino, X_teste, y_treino, y_teste = train_test_split(m, um_zero, test_size=0.25, random_state=len(m)//2)
 
-            gnb.fit(X_treino, y_treino)
-            result = gnb.predict(X=X_teste)
-            score = gnb.score(X=X_teste, y=y_teste)
-            with open('./minerados/mil/{}/{}/gnb'.format(pasta, site), 'wb') as arqdados:
-                pickle.dump(result, arqdados)
-            print('Precision-Recall, F-Score e Acurácia Naive Bayes: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+            # gnb, rfc, mlp, svc, lgr = GaussianNB(), RandomForestClassifier(), MLPClassifier(), SVC(), LogisticRegression()
 
-            rfc.fit(X_treino, y_treino)
-            result = rfc.predict(X=X_teste)
-            score = rfc.score(X=X_teste, y=y_teste)
-            with open('./minerados/mil/{}/{}/rfc'.format(pasta, site), 'wb') as arqdados:
-                pickle.dump(result, arqdados)
-            print('Precision-Recall, F-Score e Acurácia Random Forest Classifier: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+            # gnb.fit(X_treino, y_treino)
+            # result = gnb.predict(X=X_teste)
+            # score = gnb.score(X=X_teste, y=y_teste)
+            # with open('./minerados/mil/{}/{}/gnb'.format(pasta, site), 'wb') as arqdados:
+            #     pickle.dump(result, arqdados)
+            # print('Precision-Recall, F-Score e Acurácia Naive Bayes: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
-            mlp.fit(X_treino, y_treino)
-            result = mlp.predict(X=X_teste)
-            score = mlp.score(X=X_teste, y=y_teste)
-            with open('./minerados/mil/{}/{}/mlp'.format(pasta, site), 'wb') as arqdados:
-                pickle.dump(result, arqdados)
-            print('Precision-Recall, F-Score e Acurácia Multi-layer Perceptron: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+            # rfc.fit(X_treino, y_treino)
+            # result = rfc.predict(X=X_teste)
+            # score = rfc.score(X=X_teste, y=y_teste)
+            # with open('./minerados/mil/{}/{}/rfc'.format(pasta, site), 'wb') as arqdados:
+            #     pickle.dump(result, arqdados)
+            # print('Precision-Recall, F-Score e Acurácia Random Forest Classifier: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
-            svc.fit(X_treino, y_treino)
-            result = svc.predict(X=X_teste)
-            score = svc.score(X=X_teste, y=y_teste)
-            with open('./minerados/mil/{}/{}/svc'.format(pasta, site), 'wb') as arqdados:
-                pickle.dump(result, arqdados)
-            print('Precision-Recall, F-Score e Acurácia SVC: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+            # mlp.fit(X_treino, y_treino)
+            # result = mlp.predict(X=X_teste)
+            # score = mlp.score(X=X_teste, y=y_teste)
+            # with open('./minerados/mil/{}/{}/mlp'.format(pasta, site), 'wb') as arqdados:
+            #     pickle.dump(result, arqdados)
+            # print('Precision-Recall, F-Score e Acurácia Multi-layer Perceptron: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
-            lgr.fit(X_treino, y_treino)
-            result = lgr.predict(X=X_teste)
-            score = lgr.score(X=X_teste, y=y_teste)
-            with open('./minerados/mil/{}/{}/lgr'.format(pasta, site), 'wb') as arqdados:
-                pickle.dump(result, arqdados)
-            print('Precision-Recall, F-Score e Acurácia Logistic Regression: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+            # svc.fit(X_treino, y_treino)
+            # result = svc.predict(X=X_teste)
+            # score = svc.score(X=X_teste, y=y_teste)
+            # with open('./minerados/mil/{}/{}/svc'.format(pasta, site), 'wb') as arqdados:
+            #     pickle.dump(result, arqdados)
+            # print('Precision-Recall, F-Score e Acurácia SVC: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
-            print('Tempo gasto para', site.capitalize(), timer()-tempo_inicial, '\n')
+            # lgr.fit(X_treino, y_treino)
+            # result = lgr.predict(X=X_teste)
+            # score = lgr.score(X=X_teste, y=y_teste)
+            # with open('./minerados/mil/{}/{}/lgr'.format(pasta, site), 'wb') as arqdados:
+            #     pickle.dump(result, arqdados)
+            # print('Precision-Recall, F-Score e Acurácia Logistic Regression: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+
+            # print('Tempo gasto para', site.capitalize(), timer()-tempo_inicial, '\n')
         
+        # ------------------------------------------------------------ Recebendo os 200 rótulos -----------------------------------------------------------------
+        tempo_inicial = timer()
 
-        # Recebendo os 200 rótulos
+        # X_treino, y_treino = m_geral[0], m_geral[1]
+        X_treino, X_teste, y_treino, y_teste = train_test_split(m_geral[0], m_geral[1], test_size=0.25, random_state=len(m_geral[0])//2)
+        print('Somatório de rótulos totalizando:', len(m_geral[0]))
+
+        gnb, rfc, mlp, svc, lgr = GaussianNB(), RandomForestClassifier(n_jobs=-1), MLPClassifier(), SVC(), LogisticRegression(n_jobs=-1)
+
+        gnb.fit(X_treino, y_treino)
+        result = gnb.predict(X=X_teste)
+        score = gnb.score(X=X_teste, y=y_teste)
+        print('Precision-Recall, F-Score e Acurácia Naive Bayes: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+
+        rfc.fit(X_treino, y_treino)
+        result = rfc.predict(X=X_teste)
+        score = rfc.score(X=X_teste, y=y_teste)
+        print('Precision-Recall, F-Score e Acurácia Random Forest Classifier: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+
+        mlp.fit(X_treino, y_treino)
+        result = mlp.predict(X=X_teste)
+        score = mlp.score(X=X_teste, y=y_teste)
+        print('Precision-Recall, F-Score e Acurácia Multi-layer Perceptron: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+
+        svc.fit(X_treino, y_treino)
+        result = svc.predict(X=X_teste)
+        score = svc.score(X=X_teste, y=y_teste)
+        print('Precision-Recall, F-Score e Acurácia SVC: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+
+        lgr.fit(X_treino, y_treino)
+        result = lgr.predict(X=X_teste)
+        score = lgr.score(X=X_teste, y=y_teste)
+        print('Precision-Recall, F-Score e Acurácia Logistic Regression: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+
+        print('Tempo gasto para testar', len(X_teste), 'foi', timer()-tempo_inicial, '\n')  
+        # ------------------------------------------------------------ Recebendo os 200 rótulos -----------------------------------------------------------------
+
         X_treino, y_treino = m_geral[0], m_geral[1]
-
         dez_mil = []
 
         for site in gSL:
@@ -280,7 +321,7 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
             # Recebendo os 1000 htmls
             X_teste = mil.values()
 
-            gnb, rfc, mlp, svc, lgr = GaussianNB(), RandomForestClassifier(), MLPClassifier(), SVC(), LogisticRegression()
+            gnb, rfc, mlp, svc, lgr = GaussianNB(), RandomForestClassifier(n_jobs=-1), MLPClassifier(), SVC(), LogisticRegression(n_jobs=-1)
             harvest = [0,0,0,0,0]
 
             for tst in X_teste:
@@ -304,7 +345,7 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
                 result = lgr.predict(X=[tst])
                 harvest[4] += result[0]
             
-            print('Resultados Harvest usando 200 rótulos para os {} htmls de {} \nNaive Bayes: {} \nRandom Forest: {} \nMulti-layer Perceptron: {} \nSVC: {} \nLinear Regression: {}'.format(len(mil), site.capitalize(), harvest[0], harvest[1], harvest[2], harvest[3], harvest[4]))
+            print('Resultados Harvest usando {} rótulos para os {} htmls de {} \nNaive Bayes: {} \nRandom Forest: {} \nMulti-layer Perceptron: {} \nSVC: {} \nLinear Regression: {}'.format(len(X_treino), len(mil), site.capitalize(), harvest[0], harvest[1], harvest[2], harvest[3], harvest[4]))
             print('Tempo gasto nos classificadores para', site.capitalize(), timer()-tempo_inicial, '\n')
 
         tempo_inicial = timer()
@@ -312,7 +353,7 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
         # Recebendo os 10000 htmls
         X_teste = dez_mil
 
-        gnb, rfc, mlp, svc, lgr = GaussianNB(), RandomForestClassifier(), MLPClassifier(), SVC(), LogisticRegression()
+        gnb, rfc, mlp, svc, lgr = GaussianNB(), RandomForestClassifier(n_jobs=-1), MLPClassifier(), SVC(), LogisticRegression(n_jobs=-1)
         harvest = [0,0,0,0,0]
 
         for tst in X_teste:
@@ -336,8 +377,10 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
             result = lgr.predict(X=[tst])
             harvest[4] += result[0]
         
-        print('Resultados Harvest usando 200 rótulos para {} htmls vindos de todos os sites \nNaive Bayes: {} \nRandom Forest: {} \nMulti-layer Perceptron: {} \nSVC: {} \nLinear Regression: {}'.format(len(dez_mil), harvest[0], harvest[1], harvest[2], harvest[3], harvest[4]))
+        print('Resultados Harvest usando {} rótulos para {} htmls vindos de todos os sites \nNaive Bayes: {} \nRandom Forest: {} \nMulti-layer Perceptron: {} \nSVC: {} \nLinear Regression: {}'.format(len(X_treino), len(dez_mil), harvest[0], harvest[1], harvest[2], harvest[3], harvest[4]))
         print('Tempo gasto nos classificadores para avaliar todos os sites', timer()-tempo_inicial, '\n')
+
+        # Fazer testes de Precision-Recall, F-Measure, Acurácia (200 -> 1000)
         
 
 classificador(novos_dados=True, heuristica=False)
