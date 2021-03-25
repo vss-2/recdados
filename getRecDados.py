@@ -13,7 +13,7 @@ def getTagsRem() -> list:
 
 def getSitesLista() -> list:
     return ['amazon', 'mercadolivre', 'kabum', 'magazineluiza', 
-        'havan', 'nagem', 'lasereletro', 'ricardoeletro', 'carrefour', 'colombo'] 
+        'havan', 'gazin', 'lasereletro', 'ricardoeletro', 'carrefour', 'colombo'] 
 
 def getPalavrasRem(remPol: bool = True) -> set:
     # Palavras removidas
@@ -64,7 +64,7 @@ def getRobots(s:str) -> list:
         'kabum.com.br': '',
         'magazineluiza.com.br': '',
         'havan.com.br': '',
-        'nagem.com.br': '',
+        'gazin.com.br': '',
         'lasereletro.com.br': '',
         'ricardoeletro.com.br': '',
         'carrefour.com.br': '',

@@ -310,7 +310,7 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
         tempo_inicial = timer()
         
         # Recebendo os 10000 htmls
-        X_teste = dez_mil.values()
+        X_teste = dez_mil
 
         gnb, rfc, mlp, svc, lgr = GaussianNB(), RandomForestClassifier(), MLPClassifier(), SVC(), LogisticRegression()
         harvest = [0,0,0,0,0]

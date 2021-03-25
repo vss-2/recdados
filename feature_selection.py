@@ -24,7 +24,7 @@ def featureSelection(posneg: str = 'pos', contar: bool = False):
                     with zipfile.ZipFile('./10_sites_de_cada_exemplo.zip', 'r') as arqzip:
                         arqzip.extractall('./minerados/db/')
                 except:    
-                    print('Pasta \'minerados/db/\' faltando, favor deszipar o arquivo \'10_sites_de_cada_exemplo.zip\' dentro dela')
+                    print('Erro no featureSelection()\nPasta \'minerados/db/\' faltando, favor deszipar o arquivo \'10_sites_de_cada_exemplo.zip\' dentro dela')
                     exit()
             
             try:
@@ -56,6 +56,7 @@ def featureSelection(posneg: str = 'pos', contar: bool = False):
                     
                     dados.extend(titulo)
             except:
+                # print('Houve um problema com a featureSelection() do titulo')
                 pass
     
     s = set()
@@ -74,7 +75,7 @@ def featureSelection(posneg: str = 'pos', contar: bool = False):
                         arqcsv.write(str(valor)+'\n')
                     s.remove(valor)
             except:
-                print(valor)
+                # print('Houve um problema na featureSelection() dos valores')
                 pass
 
     return 
@@ -95,6 +96,7 @@ def featureSelecionadas(n: int = 10, contar: bool = False) -> list:
 
 def selecionar(numfeats: int = 9):
     with open('features.csv', 'w') as arqcsv:
+        print('Selecionando features')
         repetido = []
 
         featureSelection('pos', True)
