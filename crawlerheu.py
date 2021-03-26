@@ -18,9 +18,11 @@ def filtroGuiado(soup):
         try:
             k = acl.get('href')
             link_a_class = ' '.join(str(k).casefold().split())
-            nota = classificador(link_a_class)
-            #link_real = k.findParent('a')['href']
-            if nota > 0:
+            notalink = classificador(link_a_class)
+            notatexto = classificador(acl.text)
+            nota = notalink + notatexto
+            nota = nota / 2
+            if (notalink + notatexto) > 1:
                 sitesAvisitar.insert(0, (k, nota))
         except Exception as e:
             # print(e)
@@ -57,17 +59,16 @@ def main():
             while (count < 1000 and len(sitelinks) > count):  
                 aux = sitelinks.pop(0)[0]
                 driver.get(aux)
-                print(aux)
                 for f in range(randint(3, 13)):
                     if f%2 == 1:
                         driver.execute_script("if(document.body.scrollHeight) { window.scrollTo(0,(document.body.scrollHeight/"+str(f)+")) }")                        
                         sleep(0.4)
                     else:
                         driver.execute_script("if(document.body.scrollHeight) { window.scrollTo(0,(document.body.scrollHeight/"+str(f)+")) }")
-                        sleep(0.2)
+                        sleep(0.6)
                 page = driver.page_source
-                if not exists('./minerados/db/'+k.replace(".",("")).replace("/","").replace(":","")+'/{}.html'.format(count+1000*(linkslist.index(k)))):
-                    with open('./minerados/db/'+k.replace(".",("")).replace("/","").replace(":","")+'/{}.html'.format(count+1000*(linkslist.index(k))), 'w') as arqhtml:
+                if not exists('./minerados/db/{}.html'.format(count+1000*(linkslist.index(k)))):
+                    with open('./minerados/db/{}.html'.format(count+1000*(linkslist.index(k))), 'w') as arqhtml:
                         arqhtml.write(page)
                         arqhtml.close()
                 soup = BeautifulSoup(page, 'html.parser')
