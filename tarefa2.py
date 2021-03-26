@@ -9,8 +9,7 @@ from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from csv import reader
 from os.path import exists
-from feature_selection import selecionar
-
+from feature_selection import selecionar, minerador
 from bs4 import BeautifulSoup
 from sklearn.metrics import accuracy_score, f1_score, average_precision_score
 from sklearn.model_selection import train_test_split
@@ -22,92 +21,6 @@ import numpy as np
 import pickle
 
 warnings.filterwarnings("ignore")
-
-def minerador(sopa, feats):
-    # Implementação do TF-IDF
-    tags_rm = getTagsRem()
-    
-    for t in tags_rm:
-        for element in sopa.findAll(t):
-            element.extract()
-
-    dados = []
-    bingo = [0]*len(feats)
-    score_titulo = 0
-    score_body = 0
-    titulo = ''
-
-    # Tentar pegar informação do título
-    try:
-        if sopa.title.string != None:
-            titulo = sopa.title.string
-            if('.' in titulo):
-                titulo = titulo.replace('.', ' ')
-            if('-' in titulo):
-                titulo = titulo.replace('-', ' ')
-            if(',' in titulo):
-                titulo = titulo.replace(',', ' ')
-            if('|' in titulo):
-                titulo = titulo.replace('|', ' ')
-            if(':' in titulo):
-                titulo = titulo.replace(':', ' ')
-            if('+' in titulo):
-                titulo = titulo.replace('+', ' ')
-            
-            titulo = titulo.casefold().split(' ')
-
-            for p in getPalavrasRem():
-                if p in titulo:
-                    titulo.remove(p)
-
-            titulo = [t.strip() for t in titulo]
-
-            for index, f in enumerate(feats, 0):
-                if f in titulo:
-                    b = titulo.count(f)
-                    if index > len(feats)//2:
-                        score_titulo -= b
-                        bingo[index] = 1
-                    else:
-                        score_titulo += b
-                        bingo[index] = 1
-            
-    except Exception as e:
-        # print('Houve um problema no minerador() durante a avaliacao do score do titulo')
-        pass
-
-    # Tentar pegar informação de qualquer outro campo textual
-    try:
-        tags_sopa = sopa.findAll(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'span', 'p'])
-        for ts in tags_sopa:
-            try:
-                dados.append(ts.getText().casefold().strip())
-            except Exception as e:
-                # print('Houve um problema no minerador() durante a insercao de palavras do body')
-                pass
-    except Exception as e:
-        # print('Houve um problema no minerador() durante a coleta de campos textuais vindo das tags')
-        pass
-
-    try:
-        titulo = list(filter(lambda x: x not in getPalavrasRem(), titulo))
-    except Exception as e:
-        # print('Houve um problema no minerador() durante a remocao de palavras do titulo')
-        pass
-    
-    dados = list(filter(lambda x: x not in getPalavrasRem(), dados))
-
-    for index, f in enumerate(feats, 0):
-        if f in dados:
-            if index > len(feats)//2:
-                score_body -= dados.count(f)
-            else:
-                score_body += dados.count(f)
-
-    bingo[-2] = score_titulo
-    bingo[-1] = score_body
-
-    return bingo
 
 def classificador(novos_dados: bool = False, heuristica: bool = False):
     numfeats = 9
@@ -199,35 +112,35 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
             # score = gnb.score(X=X_teste, y=y_teste)
             # with open('./minerados/mil/{}/{}/gnb'.format(pasta, site), 'wb') as arqdados:
             #     pickle.dump(result, arqdados)
-            # print('Precision-Recall, F-Score e Acurácia Naive Bayes: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+            # print('Precision, F-Score e Acurácia Naive Bayes: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
             # rfc.fit(X_treino, y_treino)
             # result = rfc.predict(X=X_teste)
             # score = rfc.score(X=X_teste, y=y_teste)
             # with open('./minerados/mil/{}/{}/rfc'.format(pasta, site), 'wb') as arqdados:
             #     pickle.dump(result, arqdados)
-            # print('Precision-Recall, F-Score e Acurácia Random Forest Classifier: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+            # print('Precision, F-Score e Acurácia Random Forest Classifier: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
             # mlp.fit(X_treino, y_treino)
             # result = mlp.predict(X=X_teste)
             # score = mlp.score(X=X_teste, y=y_teste)
             # with open('./minerados/mil/{}/{}/mlp'.format(pasta, site), 'wb') as arqdados:
             #     pickle.dump(result, arqdados)
-            # print('Precision-Recall, F-Score e Acurácia Multi-layer Perceptron: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+            # print('Precision, F-Score e Acurácia Multi-layer Perceptron: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
             # svc.fit(X_treino, y_treino)
             # result = svc.predict(X=X_teste)
             # score = svc.score(X=X_teste, y=y_teste)
             # with open('./minerados/mil/{}/{}/svc'.format(pasta, site), 'wb') as arqdados:
             #     pickle.dump(result, arqdados)
-            # print('Precision-Recall, F-Score e Acurácia SVC: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+            # print('Precision, F-Score e Acurácia SVC: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
             # lgr.fit(X_treino, y_treino)
             # result = lgr.predict(X=X_teste)
             # score = lgr.score(X=X_teste, y=y_teste)
             # with open('./minerados/mil/{}/{}/lgr'.format(pasta, site), 'wb') as arqdados:
             #     pickle.dump(result, arqdados)
-            # print('Precision-Recall, F-Score e Acurácia Logistic Regression: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+            # print('Precision, F-Score e Acurácia Logistic Regression: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
             # print('Tempo gasto para', site.capitalize(), timer()-tempo_inicial, '\n')
         
@@ -243,27 +156,27 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
         gnb.fit(X_treino, y_treino)
         result = gnb.predict(X=X_teste)
         score = gnb.score(X=X_teste, y=y_teste)
-        print('Precision-Recall, F-Score e Acurácia Naive Bayes: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+        print('Precision, F-Score e Acurácia Naive Bayes: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
         rfc.fit(X_treino, y_treino)
         result = rfc.predict(X=X_teste)
         score = rfc.score(X=X_teste, y=y_teste)
-        print('Precision-Recall, F-Score e Acurácia Random Forest Classifier: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+        print('Precision, F-Score e Acurácia Random Forest Classifier: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
         mlp.fit(X_treino, y_treino)
         result = mlp.predict(X=X_teste)
         score = mlp.score(X=X_teste, y=y_teste)
-        print('Precision-Recall, F-Score e Acurácia Multi-layer Perceptron: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+        print('Precision, F-Score e Acurácia Multi-layer Perceptron: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
         svc.fit(X_treino, y_treino)
         result = svc.predict(X=X_teste)
         score = svc.score(X=X_teste, y=y_teste)
-        print('Precision-Recall, F-Score e Acurácia SVC: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+        print('Precision, F-Score e Acurácia SVC: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
         lgr.fit(X_treino, y_treino)
         result = lgr.predict(X=X_teste)
         score = lgr.score(X=X_teste, y=y_teste)
-        print('Precision-Recall, F-Score e Acurácia Logistic Regression: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
+        print('Precision, F-Score e Acurácia Logistic Regression: \n', average_precision_score(y_teste, result), f1_score(y_teste, result), score)
 
         print('Tempo gasto para testar', len(X_teste), 'foi', timer()-tempo_inicial, '\n')  
         # ------------------------------------------------------------ Recebendo os 200 rótulos -----------------------------------------------------------------
@@ -379,29 +292,6 @@ def classificador(novos_dados: bool = False, heuristica: bool = False):
         
         print('Resultados Harvest usando {} rótulos para {} htmls vindos de todos os sites \nNaive Bayes: {} \nRandom Forest: {} \nMulti-layer Perceptron: {} \nSVC: {} \nLinear Regression: {}'.format(len(X_treino), len(dez_mil), harvest[0], harvest[1], harvest[2], harvest[3], harvest[4]))
         print('Tempo gasto nos classificadores para avaliar todos os sites', timer()-tempo_inicial, '\n')
-
-        # Fazer testes de Precision-Recall, F-Measure, Acurácia (200 -> 1000)
         
 
-classificador(novos_dados=True, heuristica=False)
-
-def classificadorCompleto(pasta: str = 'baseline'):
-    gSL = getSitesLista()
-    resultadoCompleto = []
-    for site in gSL:
-        try:
-            classificadores = ['gnb', 'rfc', 'mlp', 'svc', 'lgr']
-            for c in classificadores:
-                with open('./minerados/mil/{}/{}/{}'.format(pasta, site, c), 'rb') as arqdados:
-                    l = pickle.load(arqdados)
-                    resultadoCompleto.append(l)
-        except Exception as e:
-            continue
-    # for rC in resultadoCompleto:
-        # print(rC)
-
-# classificadorCompleto(pasta = 'baseline')
-
-# https://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html
-# https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html
-# https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html
+classificador(novos_dados=False, heuristica=False)
