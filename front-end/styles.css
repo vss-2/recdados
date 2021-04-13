@@ -1,0 +1,82 @@
+div.barra-vertical {
+    display: flex;
+    background-color: black;
+    justify-items: center;
+    justify-content: center;
+    border: 30px;
+}
+
+p.barra-vertical{
+    font-weight: bold; 
+    font-family: monospace;
+    color: whitesmoke;
+    transition-duration: 1s;
+    content: "Eu";
+}
+
+p.barra-vertical:hover::after{
+    font-weight: bold; 
+    font-family: monospace;
+    color: whitesmoke;
+    content: "Professor: Luciano Barbosa";
+}
+
+p.barra-vertical:hover::before {
+    font-weight: bold; 
+    font-family: monospace;
+    color: whitesmoke;
+    content: "Alunos: Lucas Vinícius (@lvjs) e Vitor Sousa (@vss2)";
+    transition-duration: 1s;
+}
+
+div.corpo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+}
+
+button {
+    border-radius: 5px;
+    border-width: 10px;
+    border-style: none;
+    color: grey;
+    font-family: 'Product Sans', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 1em;
+    margin-inline: 1vh;
+    padding: 10px;
+}
+
+input {
+    border-radius: 7px;
+    border-width: thin;
+    border-color: grey;
+    border-style: none;
+    padding-left: 2%;
+    min-height: 20px;
+    min-width: 50px;
+    font-weight: lighter;
+    font-family: 'Product Sans', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 1.5em;
+    color: black;
+    box-shadow: 0px 0px 2px grey;
+}
+
+::placeholder {
+    color: lightgray;
+}
+
+div.botoes {
+    padding-top: 1em;
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+body {
+    margin: 0px;
+}
