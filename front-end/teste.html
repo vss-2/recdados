@@ -1,5 +1,20 @@
-    {% block body %}            
-        {% for age in dados %}
-            Age: {{age}}
-        {% endfor %}
-    {% endblock %}
+{% block head %}
+<link rel="stylesheet" href="styles.css">
+{% endblock %}
+
+{% block body %}
+    <div class="topbar_resultados">
+        <img class="resultados" src="RadiCS.svg" style="size: 20%;"/>
+        <div>
+            <i class="fa fa-search" aria-hidden="true"></i>
+            <input class="resultados" type="text" id='input-busca'>
+        </div>
+    </div>
+    <hr></hr>
+    <div class="resultados">
+    {% for palavra in dados.keys() %}
+        <p class='resultados'>{{palavra}}: {{dados[palavra]}}</p>
+        <br>
+    {% endfor %}
+    </div>
+{% endblock %}

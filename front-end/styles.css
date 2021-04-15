@@ -6,15 +6,20 @@ div.barra-vertical {
     border: 30px;
 }
 
-p.barra-vertical{
+p.resultados {
+    font-family: 'Product Sans', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    margin: unset;
+    color: blue;
+}
+
+p.barra-vertical {
     font-weight: bold; 
     font-family: monospace;
     color: whitesmoke;
     transition-duration: 1s;
-    content: "Eu";
 }
 
-p.barra-vertical:hover::after{
+p.barra-vertical:hover::after {
     font-weight: bold; 
     font-family: monospace;
     color: whitesmoke;
@@ -29,12 +34,43 @@ p.barra-vertical:hover::before {
     transition-duration: 1s;
 }
 
+div.resultados {
+    display: block;
+    width: 70%;
+    padding-left: 50px;
+    padding-top: 15px;
+}
+
+div.topbar_resultados {
+    display: flex;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+img.resultados {
+    margin-top: 3px;
+    height: 30px;
+    width: 300px;
+}
+
 div.corpo {
     display: flex;
     flex-direction: column;
     justify-content: center;
     justify-items: center;
     align-items: center;
+}
+
+input.resultados {
+    margin-top: 5px;
+}
+
+hr {
+    border-width: thin;
+    border-bottom-color: lightgrey;
+    border-top-color: white;
+    border-left-color: lightgrey;
+    border-right-color: lightgray;
 }
 
 button {
