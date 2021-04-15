@@ -8,10 +8,20 @@
         <link rel="stylesheet" href="styles.css">
         <title>RadiCS</title>
         <script type="text/javascript">
+            
             function buscarInput() {
                 window.location.href = 'http://127.0.0.1:5000/teste?busca=' + document.getElementById('input-busca').value;
             };
-            </script>
+            
+            // const inputListener = document.getElementById('input-busca');
+            document.addEventListener('keyup', function(e){
+                var key = e.which || e.keyCode;
+                if (key == 13) {
+                    buscarInput();
+                }
+            });
+
+        </script>
     </head>
     <body>
         <div class="barra-vertical">

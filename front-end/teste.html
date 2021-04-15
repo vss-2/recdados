@@ -4,17 +4,23 @@
 
 {% block body %}
     <div class="topbar_resultados">
-        <img class="resultados" src="RadiCS.svg" style="size: 20%;"/>
+        <a  href="http://127.0.0.1:5000">
+            <img class="resultados" src="RadiCS.svg"/>
+        </a>
         <div>
             <i class="fa fa-search" aria-hidden="true"></i>
-            <input class="resultados" type="text" id='input-busca'>
+            <input class="resultados" type="text" id="input-busca" value={{bo}}>
         </div>
     </div>
     <hr></hr>
     <div class="resultados">
     {% for palavra in dados.keys() %}
-        <p class='resultados'>{{palavra}}: {{dados[palavra]}}</p>
-        <br>
+    {% for link in dados[palavra] %}
+        <a href="">
+            <p class='links'>{{link + '.html'}}</p>
+            <p class='resultados'>{{palavra}}</p>
+        </a>
+        {% endfor %}
     {% endfor %}
     </div>
 {% endblock %}

@@ -10,6 +10,17 @@ p.resultados {
     font-family: 'Product Sans', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     margin: unset;
     color: blue;
+    font-size: 18px;
+}
+
+a {
+    text-decoration: none;
+}
+
+p.links {
+    color: green;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 14px;
 }
 
 p.barra-vertical {
@@ -37,9 +48,11 @@ p.barra-vertical:hover::before {
 div.resultados {
     display: block;
     width: 70%;
-    padding-left: 50px;
+    padding-left: 200px;
     padding-top: 15px;
 }
+
+
 
 div.topbar_resultados {
     display: flex;
@@ -50,7 +63,8 @@ div.topbar_resultados {
 img.resultados {
     margin-top: 3px;
     height: 30px;
-    width: 300px;
+    margin-left: 50px;
+    margin-right: 71px;
 }
 
 div.corpo {
