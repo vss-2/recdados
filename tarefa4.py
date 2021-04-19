@@ -6,18 +6,123 @@ from os.path import exists
 # De acordo com o slide 26 da aula de https://cin.ufpe.br/~luciano/cursos/ri/web_ir.pdf
 # Na criação do arquivo invertido temos que ter os 5 pares valor-atributo que mais frequentes
 # Creio que esses vão ser os 5 atributos mais frequentes
-pares_atributo_valor = ['marca', 'tipo de tela', 'resolução', 'polegadas', 'entradas']
+pares_atributo_valor = ['marca', 'tipo de tela', 'resolução', 'polegadas', 'entradas'] #OBS: Entradas é "confuso", pois existem HDMIs, USBs, componentes, etc
+pav = [ set('marca', 'fabricante'), 
+        set('tipo da tela', 'tipo de tela', 'tecnologia da tela', 'tecnologia'), 
+        set('resolução', 'monitor'),
+        set('polegadas', 'pol', 'tamanho da tela'),
+        set('entradas', 'entradas laterais', 'entrada lateral', 'entrada traseira', 'entradas traseiras')]
 # Tem que montar os pares (será que é pra montar tipo ['marca': ['Samsung', 'LG', 'Sony', 'Semp Toshiba', 'Multilaser']] ???),
 # E fazer o mapeamento entre sites (exemplo: 'tamanho de tela' em americanas é 'polegadas' em outro site)
 
 def extrator_americanas():
     return None
 
+def extrator_carrefour():
+    # Implementado de forma estranha pela VTex, eles não usam tablets, mas um json próprio pra substituir em spans
+    
+    # Existe um componente pai do valor atributo, exemplo real coletado:
+    # <divpai>
+    #         <span data-specification-group="Informações Técnicas" data-specification-name="Tecnologia da Tela" class="vtex-product-specifications-1-x-specificationName">Tecnologia da Tela</span>
+    #         <span data-specification-group="Informações Técnicas" data-specification-name="Tecnologia da Tela" data-specification-value="LED" class="vtex-product-specifications-1-x-specificationValue vtex-product-specifications-1-x-specificationValue--first vtex-product-specifications-1-x-specificationValue--last">LED</span>
+    # </divpai>
+    
+    # Teria que coletar para esses outro 4 componentes
+    # <span data-specification-group="Importante" data-specification-name="Itens Inclusos" class="vtex-product-specifications-1-x-specificationName">Itens Inclusos</span>
+    # <span data-specification-group="Informações Técnicas" data-specification-name="Resolução da Tela" class="vtex-product-specifications-1-x-specificationName">Resolução da Tela</span>
+    # <span data-specification-group="Informações do Produto" data-specification-name="Polegadas" class="vtex-product-specifications-1-x-specificationName">Polegadas</span>
+    # <span data-specification-group="Conectividade" data-specification-name="Entradas HDMI" class="vtex-product-specifications-1-x-specificationName">Entradas HDMI</span>
+
+def extrator_colombo():
+    # Usa modelo de div, exemplo real:
+    # <div class="caracteristicas-row">
+    #         <div class="caracteristicas-label"><span>Tipo de tela:</span></div>
+    #         <div class="caracteristicas-description">
+    #             <span>
+                    
+                        
+                        
+                        
+    #                         LED
+                        
+                    
+                    
+    #             </span>
+    #         </div>
+    #     </div>
+    # Uma boa ideia é buscar por caracteristicas-label, limpar o ":", e anexar o description (lembrar de usar .strip() pra tirar espaços em branco da string)
+
+def extrator_gazin():
+    # Usa modelo de tabela bastante simplificado, ter cuidado apenas com o &nbsp; no item-campo td na hora de limpar a string
+    # <tr class="item"><td class="item-campo">Tecnologia da tela&nbsp;</td><td class="item-valor"><span>LED</span></td></tr>
+
+def extrator_havan():
+    # Adiciona diversos <p> sem nenhuma classe dentro de uma div com class="value"
+    # <p><strong>Tela:</strong><br>
+    # Tamanho da Tela: 50".<br>
+    # Display: LCD/LED.<br>
+    # Resolução: 3840 x 2160 (4K Ultra HD).<br>
+    # Processador: Quad Core.<br>
+    # DTV: Sim.<br>
+    # HDR10: Sim.<br>
+    # Formato Tela: 16:9.<br>
+    # Frequência Nativa: 60Hz.</p>
+
+def extrator_kabum():
+    # Conteúdo encontra-se na div <div class=3D"content_tab" style=3D"width: 737px;">
+    # Insere cada característica em um <p> sem classe, OBS: tem muitos caracteres que não são UTF-8 e aparecem quebrados conexões = Conex=F5es
+    # </p><p><strong>Caracter=EDsticas:</strong></p>
+    # <p>Marca: Samsung</p>
+    # <p>Modelo: LH32BETBLGGXZD</p>
+    # <p>&nbsp;</p>
+    # <p><strong>Especifica=E7=F5es:</strong></p>
+    # <p><strong><br></strong></p>
+    # <p><strong>Tela:</strong></p>
+    # <p>- Tamanho: 32" HD</p>
+    # <p>- Brilho (T=EDpico): 250nit</p>
+    # <p>- Contraste (Tipico): 4,700:1</p>
+    # <p>- Angulo de Vis=E3o (HxV): 178:178</p>
+    # <p>- Opera=E7=E3o: 8/7</p>
+    # <p>&nbsp;</p>
+    # <p><strong>Conex=F5es:</strong></p>
+    # <p>- 2 x HDMI</p>
+    # <p>- 1 x USB</p>
+    # <p>- RF 1 Terrestrial / 1 Cable</p>
+    # <p>&nbsp;</p>
+    # <p><strong>Conectividade:&nbsp;</strong></p>
+    # <p>- RJ45</p>
+    # <p>- WiFi</p>
+    # <p>&nbsp;</p>
+    # <p><strong>Alimenta=E7=E3o:</strong></p>
+    # <p>- Energia: AC100-240V &amp; 50/60Hz</p>
+    # <p>- Consumo max de energia: 48</p>
+    # <p>&nbsp;</p>
+
+def extrator_magazineluiza():
+    # Multiplas tabelas que compõem uma tabela só, exemplo real:
+    # <table class="description__box--wildSand">
+    #   <tbody>
+    #     <tr>
+    #       <td class="description__information-left">Tecnologia</td>
+    #       <td class="description__information-right">
+    #         <table class="description__box">
+    #           <tbody>
+    #             <tr>
+    #               <td class="description__information-box-left"></td>
+    #               <td class="description__information-box-right">LED</td>
+    #             </tr>
+    #           </tbody>
+    #         </table>
+    #       </td>
+    #     </tr>
+    #   </tbody>
+    # </table>
+
+
+
 def extrator():
     site = 'americanas'
     a = '1'
-
-    element = ['script', 'style', 'noscript', 'img', 'input', 'br', 'option', 'form', 'polygon', 'svg']
 
     palavras = dict()
     titulos = []
@@ -29,9 +134,6 @@ def extrator():
             with open('./minerados/db/{}/{}.html'.format(site, a), 'r') as arqhtml:
                 sopa = BeautifulSoup(arqhtml, 'html.parser')
                 extraidos = []
-                for e in element:
-                    for sfa in sopa.findAll(e):
-                        sopa.extract()
                 sfatd = sopa.findAll('title')
                 titulos.append(sfatd[0].text.lower())
                 sfatd = sopa.findAll('td')
