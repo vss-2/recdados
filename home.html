@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt">
+    <head>
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="styles.css">
+        <title>RadiCS</title>
+        <script type="text/javascript">
+            
+            function buscarInput() {
+                window.location.href = 'http://127.0.0.1:5000/teste?busca=' + document.getElementById('input-busca').value;
+            };
+            
+            // const inputListener = document.getElementById('input-busca');
+            document.addEventListener('keyup', function(e){
+                var key = e.which || e.keyCode;
+                if (key == 13) {
+                    buscarInput();
+                }
+            });
+
+        </script>
+    </head>
+    <body>
+        <div class="barra-vertical">
+            <p class="barra-vertical">
+                &nbsp;&nbsp;&nbsp;&nbsp;| Recuperação da Informação |&nbsp;&nbsp;&nbsp;&nbsp;
+            </p> 
+        </div>
+        <div class="corpo">
+            <img src='RadiCS.svg'/>
+            <div>
+                <i class="fa fa-search" aria-hidden="true"></i>
+                <input type="text" id='input-busca'>
+                <i class="fa fa-search" aria-hidden="true"></i>
+                <input type="text" id='input-busca'>
+                <i class="fa fa-search" aria-hidden="true"></i>
+                <input type="text" id='input-busca'>
+                <i class="fa fa-search" aria-hidden="true"></i>
+                <input type="text" id='input-busca'>
+                <i class="fa fa-search" aria-hidden="true"></i>
+                <input type="text" id='input-busca'>
+            </div>
+        </div>
+        <div class="botoes">
+            <button type="submit" onclick="buscarInput();">Estou com sorte</button>
+            <button>Pesquisa RadiCS</button>
+        </div>
+    </body>
+</html>
