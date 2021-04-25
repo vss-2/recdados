@@ -2,6 +2,8 @@ from itertools import count
 from sklearn.metrics.pairwise import cosine_similarity
 from numpy import array
 from re import sub
+from csv import reader
+from os import listdir
 import pprint
 
 pag1 = 'To do is to be to be is to do'
@@ -95,6 +97,7 @@ def cossenoScore(queue = [str], K = int, index = [indiceInvertido]):
     queue = [q.lower().strip() for q in queue]
     for q in queue:
         if q in index[0].vocabulario.keys() and q in index[1].vocabulario.keys():
+            print(index[0].vocabulario[q])
             scores.append(cosine_similarity(array(index[0].vocabulario[q]), array(index[1].vocabulario[q])))
         else:
             print('Palavra procurada:', q ,'não está no índice invertido, vou pular!')
@@ -102,6 +105,42 @@ def cossenoScore(queue = [str], K = int, index = [indiceInvertido]):
     for d in range(len(scores)):
         scores[d] = scores[d][0]/tamanho[d]
     return scores[:K]
+
+def cosScore(queue = [str], K = int, index = [indiceInvertido]):
+    scores = []
+
+    tamanho = [len(x.paginas) for x in index]
+    tamanho_array = []
+
+    for q in queue:
+        wtq = queue.count(q)/len(queue)
+        wftd = 0
+        c = 0
+        for i in index:
+            total = 0
+
+            for a in i.aparicoes:
+                if a[0] == q:
+                    wftd += a[1]
+                total += a[1]
+            tamanho_array.append(wftd/total)
+
+            if wftd != 0:
+                scores.append(wtq * wftd)
+            else:
+                print('Não encontrei:', q)
+                scores.append(0)
+
+            print(len(scores), len(tamanho))
+            for d in range(tamanho[c] - 1):
+                scores[d] = scores[d]/tamanho[d]
+            
+            c += 1
+    
+    print(scores)
+    
+    return scores[:K]
+
 
 def testar():
     # Testando indice invertido
@@ -153,11 +192,37 @@ def testar():
 
 # testar()
 
-# Funcionamento do Cosseno Score
-# https://datascience.stackexchange.com/questions/26648/cosine-similarity-returns-matrix-instead-of-single-value
-# from sklearn.metrics.pairwise import cosine_similarity
-# from numpy import array
-# vec1 = array([[1,1],[0,1]])
-# vec2 = array([[1,1],[0,1]])
-# #print(cosine_similarity([vec1, vec2]))
-# print(cosine_similarity(vec1, vec2))
+pags = []
+
+for arq in listdir('./extraído'):
+    with open('./extraído/'+arq, 'r') as arqcsv:
+        linhas = reader(arqcsv)
+        for l in linhas:
+            pags.append([k.strip() for k in l])
+        pags.pop(0)
+
+    pags = [' '.join(p) for p in pags]
+    # print(pags[1])
+
+ii = indiceInvertido(pags = pags)
+ii.processar()
+
+pp = pprint.PrettyPrinter(indent=4)
+# print(ii.vocabulario)
+# print(ii.aparicoes)
+docs = []
+for p in pags:
+    docs.append(documento(content = p))
+# print(d.at_a_time(['Samsung', 'LED']))
+
+pesos = dict({'body': 0.6, 'title': 0.4})
+busca = ['Samsung', 'Wi-fi']
+for b in busca:
+    b = b.lower().strip()
+    for d in docs:
+        z = zoneScoring(document = d, queue = [b], g = pesos)
+        if z != 0.0:
+            print('Zone Scoring de ', b, ': ', z, sep='')
+
+cosScore(queue = ['philco', 'brilho'], K = 10, index = [ii])
+
