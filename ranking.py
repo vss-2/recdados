@@ -6,6 +6,8 @@ from csv import reader
 from os import listdir
 from numpy import digitize
 from math import log
+from numpy import dot
+from numpy.linalg import norm
 import pprint
 import pandas as pd
 import re
@@ -144,8 +146,8 @@ def cosScore(queue = [str], K = int, index = [indiceInvertido]):
         # scores[s] = (scores[s], s, index[0].paginas[s])
 
     scores.sort(key= lambda x: x[0], reverse=True)
-    for arq in scores[:K]:
-        print(arq[0])
+    # for arq in scores[:K]:
+        # print(arq[0])
         # print('->>>', index[0].paginas[arq[1]-1], '<<<-')
 
     return scores[:K]
@@ -178,8 +180,8 @@ def cosseno_tfidf(queue = [str], K = int, index = [indiceInvertido]):
         # scores[s] = (scores[s], s, index[0].paginas[s])
 
     scores.sort(key= lambda x: x[0], reverse=True)
-    for arq in scores[:K]:
-        print(arq[0])
+    # for arq in scores[:K]:
+        # print(arq[0])
         # print('<<<-', index[0].paginas[arq[1]-1], '->>>')
 
     return scores[:K]
@@ -291,6 +293,74 @@ def main():
     ii = indiceInvertido(pags = pags, pols = discretizar)
     ii.processar()
 
+    def espaco_vetor(indice, busca, df):
+        resultado_semelhanca = []
+
+        if type(busca) == str:
+            b = list(filter(lambda x: len(x)>1, sub('[,.-;:!\'\n()]', ' ', busca.lower()).split(' ')))
+        else:
+            for r in range(len(busca)):
+                busca.extend(list(filter(lambda x: len(x)>1, sub('[,.-;:!\'\n()]', ' ', busca[r].lower()).split(' '))))
+            b = busca
+
+        t_doc, t_bus = [], []
+        for documento in indice[0].paginas:
+            d = []
+            if type(documento) == str:
+                d = list(filter(lambda x: len(x)>1, sub('[,.-;:!\'\n()]', ' ', documento.lower()).split(' ')))
+            else:
+                for r in range(len(documento)):
+                    d.extend(list(filter(lambda x: len(x)>1, sub('[,.-;:!\'\n()]', ' ', documento[r].lower()).split(' '))))
+
+            # break
+            sd = set(d)
+            sb = set(b)
+            # ambos serão uma lista, salvei conjunto só pra uso futuro (mais rápido)
+
+            # token de feito a partir de todos os documentos
+            tokens = map(lambda x: x[0], indice[0].aparicoes)
+
+            temp_doc, temp_bus = [], []
+
+            for t in tokens:
+                if t in d: temp_doc.append(1)
+                else: temp_doc.append(0)
+                if t in b: temp_bus.append(1)
+                else: temp_bus.append(0)
+            
+            t_doc.extend([temp_doc])
+            t_bus.extend([temp_bus])
+            
+            resultado_semelhanca.append((dot(temp_doc, temp_bus) / (norm(temp_doc) * norm(temp_bus))))
+            # print('Resultado da semelhança espaco vetorial:', resultado_semelhanca[-1:])
+
+        df['Resultado Cosseno'] = ['Resultado Cosseno'] + resultado_semelhanca
+        return t_doc, t_bus
+    
+    r1, r2 = espaco_vetor([ii], busca=['samsung', 'led'], df=df)
+
+    def correlacao_spearman(r1, r2):
+        quadrado = []
+        ranking1 = r1
+        ranking2 = r2
+        
+        for i in range(len(ranking1)):
+            for j in range(len(ranking2)):
+                if ranking1[i] == ranking2[j]:
+                    quad = (i-j)**2
+                else:
+                    quad = 0
+                quadrado.append(quad)
+        
+        d = ranking1 + ranking2
+        return 1 - ( (6*sum(quadrado)) / (len(d) * ( (len(d)**2)-1) ) )
+
+    resultados_spearman = []
+    
+    for r in range(len(r1)):
+        resultados_spearman.append(correlacao_spearman(r1[r], r2[r]))
+    # print(resultados_spearman)
+
     pp = pprint.PrettyPrinter(indent=4)
 
     # print(df.Marca.str.contains('samsung', regex=False))
@@ -328,8 +398,8 @@ def main():
         b = b.lower().strip()
         for d in docs:
             z = zoneScoring(document = d, queue = [b], g = pesos)
-            if z != 0.0:
-                print('Zone Scoring de ', b, ': ', z, sep='')
+            # if z != 0.0:
+                # print('Zone Scoring de ', b, ': ', z, sep='')
 
     cs = cosScore(queue = ['tcl'], K = 10, index = [ii])
     cs = cosseno_tfidf(queue = ['tcl'], K = 10, index = [ii])
