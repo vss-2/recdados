@@ -47,6 +47,11 @@ class indiceInvertido:
         self.vocabulario = dict()
         self.aparicoes = []
         self.paginas = pags
+        self.termos = []
+        for p in self.paginas:
+            # print(p)
+            self.termos.append(len(p.lower().strip().split(' ')))
+        # print(self.termos)
         return
 
     def compactarPostings(self):
@@ -107,38 +112,36 @@ def cossenoScore(queue = [str], K = int, index = [indiceInvertido]):
     return scores[:K]
 
 def cosScore(queue = [str], K = int, index = [indiceInvertido]):
-    scores = []
-
-    tamanho = [len(x.paginas) for x in index]
-    tamanho_array = []
-
+    scores = [0] * len(index[0].termos)
+    length = index[0].termos
+    # print(index[0].vocabulario)
+    
     for q in queue:
+        # Tratar termo
+        # Calcular importância do termo na query
         wtq = queue.count(q)/len(queue)
-        wftd = 0
-        c = 0
-        for i in index:
-            total = 0
 
-            for a in i.aparicoes:
-                if a[0] == q:
-                    wftd += a[1]
-                total += a[1]
-            tamanho_array.append(wftd/total)
+        # Buscar a posting list de cada documento
+        busca = index[0].vocabulario[q]
+        for b in busca:
+            # 'ultrawide': [[218, 1], [226, 1]]
+            scores[b[0]] += b[1] * wtq
 
-            if wftd != 0:
-                scores.append(wtq * wftd)
-            else:
-                print('Não encontrei:', q)
-                scores.append(0)
+        for s in range(len(scores)):
+            scores[s] = scores[s]/length[s]
 
-            print(len(scores), len(tamanho))
-            for d in range(tamanho[c] - 1):
-                scores[d] = scores[d]/tamanho[d]
-            
-            c += 1
-    
-    print(scores)
-    
+        # print(scores)
+
+    for s in range(len(scores)):
+        title = index[0].paginas[s].find('.html') + 5
+        title = index[0].paginas[s][title:]
+        scores[s] = (scores[s], s, title.strip())
+        # scores[s] = (scores[s], s, index[0].paginas[s])
+
+    scores.sort(key= lambda x: x[0], reverse=True)
+    for arq in scores[:K]:
+        print('->>>', index[0].paginas[arq[1]-1], '<<<-')
+
     return scores[:K]
 
 
@@ -192,37 +195,42 @@ def testar():
 
 # testar()
 
-pags = []
+def main():
+    pags = []
+    for arq in listdir('./extraído'):
+        with open('./extraído/'+arq, 'r') as arqcsv:
+            linhas = reader(arqcsv)
+            for l in linhas:
+                pags.append([k.strip()+' ' for k in l])
+            pags.pop(0)
+        # print(pags[1])
+    
+    pags = [''.join(x).lower() for x in pags]
 
-for arq in listdir('./extraído'):
-    with open('./extraído/'+arq, 'r') as arqcsv:
-        linhas = reader(arqcsv)
-        for l in linhas:
-            pags.append([k.strip() for k in l])
-        pags.pop(0)
+    ii = indiceInvertido(pags = pags)
+    ii.processar()
 
-    pags = [' '.join(p) for p in pags]
-    # print(pags[1])
+    pp = pprint.PrettyPrinter(indent=4)
+    # pp.pprint(pags[1])
+    # pp.pprint(sorted(ii.vocabulario))
+    # pp.pprint(ii.vocabulario)
+    # pp.pprint(ii.aparicoes)
+    # print(ii.vocabulario)
+    docs = []
+    for p in pags:
+        docs.append(documento(content = p))
+    # print(d.at_a_time(['Samsung', 'LED']))
 
-ii = indiceInvertido(pags = pags)
-ii.processar()
+    pesos = dict({'body': 0.6, 'title': 0.4})
+    busca = ['Samsung', 'Wi-fi']
+    for b in busca:
+        b = b.lower().strip()
+        for d in docs:
+            z = zoneScoring(document = d, queue = [b], g = pesos)
+            if z != 0.0:
+                print('Zone Scoring de ', b, ': ', z, sep='')
 
-pp = pprint.PrettyPrinter(indent=4)
-# print(ii.vocabulario)
-# print(ii.aparicoes)
-docs = []
-for p in pags:
-    docs.append(documento(content = p))
-# print(d.at_a_time(['Samsung', 'LED']))
+    cs = cosScore(queue = ['tcl'], K = 10, index = [ii])
+    # pp.pprint(cs)
 
-pesos = dict({'body': 0.6, 'title': 0.4})
-busca = ['Samsung', 'Wi-fi']
-for b in busca:
-    b = b.lower().strip()
-    for d in docs:
-        z = zoneScoring(document = d, queue = [b], g = pesos)
-        if z != 0.0:
-            print('Zone Scoring de ', b, ': ', z, sep='')
-
-cosScore(queue = ['philco', 'brilho'], K = 10, index = [ii])
-
+main()
