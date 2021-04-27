@@ -138,7 +138,7 @@ def cosScore(queue = [str], K = int, index = [indiceInvertido]):
 
     return scores[:K]
 
-def cosseno_limpo(queue = [str], K = int, index = [indiceInvertido]):
+def cosseno_limpo(queue = [str], K = int, index = [indiceInvertido], field = dict):
     scores = [0] * (len(index[0].termos)+1)
     scores2 = []
     for r in range(len(index[0].termos)+1):
@@ -154,7 +154,11 @@ def cosseno_limpo(queue = [str], K = int, index = [indiceInvertido]):
         wtq = queue.count(q)/len(queue)
 
         # Buscar a posting list de cada documento
-        busca = index[0].vocabulario[q]
+        try:
+            busca = field[q]
+        except:
+            # return None, None
+            pass
         # print(busca)
         peso_query.append( (1+log(queue.count(q))) * log(len(index[0].paginas)/len(busca)))
         for b in busca:
@@ -186,7 +190,7 @@ def cosseno_limpo(queue = [str], K = int, index = [indiceInvertido]):
 
     return scores2, peso_query
 
-def cosseno_tfidf(queue = [str], K = int, index = [indiceInvertido]):
+def cosseno_tfidf(queue = [str], K = int, index = [indiceInvertido], field = dict):
     scores = [0] * (len(index[0].termos)+1)
     scores2 = []
     for r in range(len(index[0].termos)+1):
@@ -202,7 +206,11 @@ def cosseno_tfidf(queue = [str], K = int, index = [indiceInvertido]):
         wtq = queue.count(q)/len(queue)
 
         # Buscar a posting list de cada documento
-        busca = index[0].vocabulario[q]
+        try: 
+            busca = field[q]
+        except:
+            # return None, None
+            pass
         # print(busca)
         peso_query.append( (1+log(queue.count(q))) * log(len(index[0].paginas)/len(busca)))
         for b in busca:
@@ -369,6 +377,9 @@ def main():
     # print(marca)
     ii = indiceInvertido(pags = pags, pols = discretizar)
     ii.processar()
+    print(ii.vocabulario)
+    ii.compactarPostings()
+    print(ii.vocabulario)
 
     def espaco_vetor(indice, busca, df):
         resultado_semelhanca = []
@@ -456,22 +467,22 @@ def main():
     # print(field_index_idf('lg', 'Marca'))
 
     # ---------------- Criando Field Index ---------------------
-    field_index = dict({'Marca': [], 'Tecnologia': [], 'Tela': []})
+    field_index = dict({'Marca': dict(), 'Tecnologia': dict(), 'Tela': dict()})
     for m in df.Marca.unique():
         m_array = field_index_idf(m, 'Marca')
-        field_index['Marca'].append(dict({m: m_array}))
+        field_index['Marca'].update(dict({m: m_array}))
 
     # pp.pprint(field_index['Marca'])
 
     for m in df.Tecnologia.unique():
         m_array = field_index_idf(m, 'Tecnologia')
-        field_index['Tecnologia'].append(dict({m: m_array}))
+        field_index['Tecnologia'].update(dict({m: m_array}))
 
     # pp.pprint(field_index['Tecnologia'])
 
     for m in df.Tela.unique():
         m_array = field_index_idf(m, 'Tela')
-        field_index['Tela'].append(dict({m: m_array}))
+        field_index['Tela'].update(dict({m: m_array}))
 
     # pp.pprint(field_index['Tela'])
     
@@ -542,7 +553,157 @@ def main():
     # print('Cosseno com TF', [x[1] for x in sim_limpo])
 
     print(correlacao_spearman(sim, sim_limpo))
+    print(field_index['Tela'].keys())
 
     # pp.pprint(cs)
 
-main()
+# main()
+
+df = pd.read_csv('./extraído/amazon - amazon.csv')
+pags = []
+discretizar = []
+marca = []
+tipo_tela = []
+
+def tratar_marca(x):
+    t = str(x).strip().lower().split(' ')
+    if len(t)>1:
+        t = t[1]
+        return str(t).lower().strip().replace('\'','').replace('\"','').replace(',','.')
+    return str(x).strip().lower()
+
+def tratar_tecnologia(x):
+    t = str(x).strip().lower().split(' ')
+    if len(t)>1:
+        if '-' in t: t.remove('-')
+        if 'crystal' in t: t.remove('crystal')
+        if 'ultra' in t: t.remove('ultra')
+        t = t[0]
+        return str(t).lower().strip().replace('\'','').replace('\"','').replace(',','.').replace('\n','').replace('-','')
+    return x.strip().lower()
+
+def tratar_tela(x):
+    x = list(filter(lambda x: len(x)>1, sub('[,.-;:!\'\n()]x', ' ', x.lower().strip()).split(' ')))
+    # print(x)
+    if '8k' in x or '4320' in x: return '8k'
+    if '3860' in x or '4k' in x: return '4k'
+    if '2160' in x: return '2k'
+    if '1080' in x or '19201080': return 'full hd'
+    if '768' or '720' in x: return 'hd'
+    return None
+
+with open('./extraído/amazon - amazon.csv', 'r') as arqcsv:
+    linhas = reader(arqcsv)
+    for l in linhas:
+        if l[1].lower().strip() != 'tamanho':
+            posicao_marca = l[0].lower().strip().split(' ')
+            if len(posicao_marca)>1:
+                l[0] = l[0].strip().lower().split(' ')[1]
+            marca.append(l[0].lower().strip().replace('\'','').replace('\"','').replace(',','.'))
+            discretizar.append(float(l[1].lower().strip().replace('\'','').replace('\"','').replace(',','.').replace(' polegadas','').replace(' centímetros','').replace(' pol','')))
+            pags.append([k.strip()+' ' for k in l])
+    pags.pop(0)
+
+df['Marca'] = df['Marca'].map(lambda x: tratar_marca(x))
+# print(df.Marca.values)
+df['Polegadas Discretas'] = digitize(discretizar, [25,50,75,100])
+# print(df['Polegadas Discretas'].values)
+df['Tamanho'] = discretizar
+# print(df.Tamanho.values)
+df['Tecnologia'] = df['Tecnologia'].map(lambda x: tratar_tecnologia(x))
+# print(df.Tecnologia.values)
+df['Tela'] = df['Tela'].map(lambda x: tratar_tela(x))
+# print(df.Tela.values)
+
+def field_index_idf(termo, campo):
+    idf = []
+    for x in range(len(df[campo])):
+        times = df[campo][x].count(termo)
+        if times > 0:
+            idf.append((x, times))
+    return idf
+
+field_index = dict({'Marca': dict(), 'Tecnologia': dict(), 'Tela': dict()})
+for m in df.Marca.unique():
+    m_array = field_index_idf(m, 'Marca')
+    field_index['Marca'].update(dict({m: m_array}))
+
+# pp.pprint(field_index['Marca'])
+
+for m in df.Tecnologia.unique():
+    m_array = field_index_idf(m, 'Tecnologia')
+    field_index['Tecnologia'].update(dict({m: m_array}))
+
+# pp.pprint(field_index['Tecnologia'])
+
+for m in df.Tela.unique():
+    m_array = field_index_idf(m, 'Tela')
+    field_index['Tela'].update(dict({m: m_array}))
+
+with open('./extraído/amazon - amazon.csv', 'r') as arqcsv:
+    linhas = reader(arqcsv)
+    for l in linhas:
+        if l[1].lower().strip() != 'tamanho':
+            posicao_marca = l[0].lower().strip().split(' ')
+            if len(posicao_marca)>1:
+                l[0] = l[0].strip().lower().split(' ')[1]
+            marca.append(l[0].lower().strip().replace('\'','').replace('\"','').replace(',','.'))
+            discretizar.append(float(l[1].lower().strip().replace('\'','').replace('\"','').replace(',','.').replace(' polegadas','').replace(' centímetros','').replace(' pol','')))
+            pags.append([k.strip()+' ' for k in l])
+    pags.pop(0)
+
+pags = [''.join(x).lower() for x in pags]
+
+# Criação de Postings (Vocabulário)
+ii = indiceInvertido(pags = pags, pols = discretizar)
+
+def correlacao_spearman(r1, r2):
+    quadrado = []
+    ranking1 = r1
+    ranking2 = r2
+    
+    for i in range(len(ranking1)):
+        for j in range(len(ranking2)):
+            if ranking1[i] == ranking2[j]:
+                quad = (i-j)**2
+            else:
+                quad = 0
+            quadrado.append(quad)
+    
+    d = ranking1 + ranking2
+    return 1 - ( (6*sum(quadrado)) / (len(d) * ( (len(d)**2)-1) ) )
+
+def processamento_consulta(entrada):
+    # (field_index) Marca.consulta
+    campo = entrada[0]  # 'Marca'
+    pesquisa = entrada[1] # ['Samsung', 'led']
+    
+    dn, q = cosseno_tfidf(queue = pesquisa, index=[ii], field=field_index[campo])
+    dn_limpo, q_limpo = cosseno_limpo(queue = pesquisa, index=[ii], field=field_index[campo])
+
+    sim = []
+    c = 0
+    for n in dn:
+        if n == [0,0]: sim.append((0, c))
+        else: 
+            # print(n, q)
+            sim.append(( (dot(n, q) / ( norm(n) * norm(q) )), c))
+        c+=1
+    sim.sort(key=lambda x: x[0], reverse=True)
+    # print('Cosseno TF-IDF', [x[1] for x in sim])
+
+    # -------------------------------------------------------------------------
+
+    sim_limpo = []
+    c = 0
+    for n in dn_limpo:
+        if n == [0,0]: sim_limpo.append((0, c))
+        else: 
+            # print(n, q)
+            sim_limpo.append(( (dot(n, q_limpo) / ( norm(n) * norm(q_limpo) )), c))
+        c+=1
+    sim_limpo.sort(key=lambda x: x[0], reverse=True)
+    # print('Cosseno com TF', [x[1] for x in sim_limpo])
+    print(correlacao_spearman(sim, sim_limpo))
+
+processamento_consulta(['Marca', ['sony', 'samsung', 'acer', 'lg']])
