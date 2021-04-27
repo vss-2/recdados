@@ -24,7 +24,7 @@ class documento:
         # OBS: caso modificar tratamento, modificar também 
         # na função processar do indiceInvertido
         tratamento = ' '.join(content).lower()
-        tratamento = sub('[,.-;:!]', ' ', tratamento)
+        tratamento = sub('[,.-;:!\'\n()]', ' ', tratamento)
         self.conteudo = list(filter(lambda x: len(x)>0, tratamento.split(' ')))
         self.score = 0
 
@@ -86,7 +86,7 @@ class indiceInvertido:
         
         for f in self.paginas:
             # f2 = f.lower().split(' ') # antigo: sem tratamento de string
-            f2 = list(filter(lambda x: len(x)>0, sub('[,.-;:!]', ' ', f.lower()).split(' ')))
+            f2 = list(filter(lambda x: len(x)>0, sub('[,.-;:!\'\n()]', ' ', f.lower()).split(' ')))
             
             for palavra in set(f2):
                 conta = f2.count(palavra)
@@ -103,20 +103,6 @@ def zoneScoring(document, queue = [str], g = dict):
     # print(queue, (document.at_a_time(consulta = queue) > 0))
     return g['title'] * (document.at_a_time(consulta = queue) > 0) + g['body'] * (document.at_a_time(consulta = queue) > 0)
 
-def cossenoScore(queue = [str], K = int, index = [indiceInvertido]):
-    scores = []
-    tamanho = [len(i.vocabulario) for i in index]
-    queue = [q.lower().strip() for q in queue]
-    for q in queue:
-        if q in index[0].vocabulario.keys() and q in index[1].vocabulario.keys():
-            print(index[0].vocabulario[q])
-            scores.append(cosine_similarity(array(index[0].vocabulario[q]), array(index[1].vocabulario[q])))
-        else:
-            print('Palavra procurada:', q ,'não está no índice invertido, vou pular!')
-            continue
-    for d in range(len(scores)):
-        scores[d] = scores[d][0]/tamanho[d]
-    return scores[:K]
 
 def cosScore(queue = [str], K = int, index = [indiceInvertido]):
     scores = [0] * len(index[0].termos)
@@ -219,6 +205,21 @@ def testar():
             z = zoneScoring(document = d, queue = [q], g = pesos)
             print('Zone Scoring de ', q, ': ', z, sep='') # 0.0 1.0
 
+    def cossenoScore(queue = [str], K = int, index = [indiceInvertido]):
+        scores = []
+        tamanho = [len(i.vocabulario) for i in index]
+        queue = [q.lower().strip() for q in queue]
+        for q in queue:
+            if q in index[0].vocabulario.keys() and q in index[1].vocabulario.keys():
+                print(index[0].vocabulario[q])
+                scores.append(cosine_similarity(array(index[0].vocabulario[q]), array(index[1].vocabulario[q])))
+            else:
+                print('Palavra procurada:', q ,'não está no índice invertido, vou pular!')
+                continue
+        for d in range(len(scores)):
+            scores[d] = scores[d][0]/tamanho[d]
+        return scores[:K]
+
     def c_score():
         ii = indiceInvertido([pag1, pag2])
         ii2 = indiceInvertido([pag3, pag4])
@@ -276,15 +277,29 @@ def main():
             if 'ultra' in t: t.remove('ultra')
             t = t[0]
             return str(t).lower().strip().replace('\'','').replace('\"','').replace(',','.').replace('\n','').replace('-','')
-        return str(x).strip().lower()
+        return x.strip().lower()
 
-    # def tratar_tela(x):
-    #     re.search(' [0:9][0:9][0:9]')
+    def tratar_tela(x):
+        x = list(filter(lambda x: len(x)>1, sub('[,.-;:!\'\n()]x', ' ', x.lower().strip()).split(' ')))
+        # print(x)
+        if '8k' in x or '4320' in x: return '8k'
+        if '3860' in x or '4k' in x: return '4k'
+        if '2160' in x: return '2k'
+        if '1080' in x or '19201080': return 'full hd'
+        if '768' or '720' in x: return 'hd'
+        return None
+
 
     df['Marca'] = df['Marca'].map(lambda x: tratar_marca(x))
+    # print(df.Marca.values)
     df['Polegadas Discretas'] = digitize(discretizar, [25,50,75,100])
+    # print(df['Polegadas Discretas'].values)
     df['Tamanho'] = discretizar
-    # df['Tecnologia'] = df['Tecnologia'].map(lambda x: tratar_tecnologia(x))
+    # print(df.Tamanho.values)
+    df['Tecnologia'] = df['Tecnologia'].map(lambda x: tratar_tecnologia(x))
+    # print(df.Tecnologia.values)
+    df['Tela'] = df['Tela'].map(lambda x: tratar_tela(x))
+    # print(df.Tela.values)
 
     # print(df.Tela.unique())
     # print(pags[1])
@@ -356,9 +371,9 @@ def main():
         return 1 - ( (6*sum(quadrado)) / (len(d) * ( (len(d)**2)-1) ) )
 
     resultados_spearman = []
-    
-    for r in range(len(r1)):
-        resultados_spearman.append(correlacao_spearman(r1[r], r2[r]))
+    # print(r1)
+    # for r in range(len(r1)):
+        # resultados_spearman.append(correlacao_spearman(r1[r], r2[r]))
     # print(resultados_spearman)
 
     pp = pprint.PrettyPrinter(indent=4)
@@ -375,12 +390,37 @@ def main():
 
     # print(field_index_idf('lg', 'Marca'))
 
+    # ---------------- Criando Field Index ---------------------
+    field_index = dict({'Marca': [], 'Tecnologia': [], 'Tela': []})
+    for m in df.Marca.unique():
+        m_array = field_index_idf(m, 'Marca')
+        field_index['Marca'].append(dict({m: m_array}))
+
+    # pp.pprint(field_index['Marca'])
+
+    for m in df.Tecnologia.unique():
+        m_array = field_index_idf(m, 'Tecnologia')
+        field_index['Tecnologia'].append(dict({m: m_array}))
+
+    # pp.pprint(field_index['Tecnologia'])
+
+    for m in df.Tela.unique():
+        m_array = field_index_idf(m, 'Tela')
+        field_index['Tela'].append(dict({m: m_array}))
+    
+    pp.pprint(field_index['Tela'])
+    
+    # print(field_index)
+    # pp.pprint(field_index)
+    # ----------------------------------------------------------
+
     # field_index = pd.DataFrame()
-    # df['Marca']
-    # df['Tamanho']
-    # df['Tecnologia']
-    # df['Tela']
-    # df['Entrada']
+    
+    # print(df['Marca'].unique())
+    # print(df['Tamanho'].unique())
+    # print(df['Tecnologia'].unique())
+    # print(df['Tela'].unique())
+    # print(df['Entradas'].unique())
 
     # pp.pprint(pags[1])
     # pp.pprint(sorted(ii.vocabulario))
