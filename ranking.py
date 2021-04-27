@@ -616,12 +616,60 @@ df['Tecnologia'] = df['Tecnologia'].map(lambda x: tratar_tecnologia(x))
 df['Tela'] = df['Tela'].map(lambda x: tratar_tela(x))
 # print(df.Tela.values)
 
+
+def gama_compactacao(valor):
+    log2 = lambda x: log(x, 2)
+    
+    def unario(x):
+        return (x-1)*'0'+'1'
+    
+    def binario(x, l = 1):
+        s = '{0:0%db}' % l
+        return s.format(x)
+        
+    def gama(x):
+        if(x == 0): 
+            return '0'
+    
+        n = 1 + int(log2(x))
+        b = x - 2**(int(log2(x)))
+    
+        l = int(log2(x))
+    
+        k = unario(n) + binario(b, l)
+        return array([int(x) for x in k], dtype=bool8)
+    
+    return gama(valor)
+    # print(gama(10))
+
+compactados = [0, 0, 0]
+def comparar_compactacao(p1, p2, p3):
+    compactados[0] += getsizeof(p1)
+    compactados[1] += getsizeof(p2)
+    compactados[2] += getsizeof(p3)
+    return
+
 def field_index_idf(termo, campo):
     idf = []
     for x in range(len(df[campo])):
         times = df[campo][x].count(termo)
         if times > 0:
             idf.append((x, times))
+    # print(idf, '------------------------------------')
+
+    idf2 = idf.copy()
+    idf3 = idf.copy()
+
+    if compactar_field:
+        l = list(map(lambda x: x[0]-idf2[idf2.index(x)-1][0], idf2[1:]))
+        for x in range(1, len(idf2)):
+            if compactar_gama == True:
+                idf3[x] = (gama_compactacao(l[x-1]), idf2[x][1])
+            idf2[x] = (l[x-1], idf2[x][1])
+        
+        # print(idf2, idf3)
+    
+    comparar_compactacao(idf, idf2, idf3)
     return idf
 
 field_index = dict({'Marca': dict(), 'Tecnologia': dict(), 'Tela': dict()})
