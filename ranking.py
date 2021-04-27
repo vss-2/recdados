@@ -213,6 +213,7 @@ def cosseno_tfidf(queue = [str], K = int, infos = [indiceInvertido], field = dic
             busca = field[q]
         except:
             # return None, None
+            # busca = 'Marca'
             pass
         # print(busca)
         peso_query.append( (1+log(queue.count(q))) * log(len(infos[0].paginas)/len(busca)))
@@ -675,9 +676,9 @@ def field_index_idf(termo, campo):
         
     # print(idf2, idf3)
     comparar_compactacao(idf, idf2, idf3)
-    print(termo, campo)
+    # print(termo, campo)
     # pp.pprint(idf)
-    pp.pprint(idf2)
+    # pp.pprint(idf2)
     # pp.pprint(idf3)
     return idf
 
@@ -699,9 +700,9 @@ for m in df.Tela.unique():
     m_array = field_index_idf(m, 'Tela')
     field_index['Tela'].update(dict({m: m_array}))
 
-print('Tamanho do field index sem compactação:', compactados[0],
-    '\nTamanho do field index com compactação:', compactados[1],
-    '\nTamanho do field index com Gama Code:', compactados[2])
+# print('Tamanho do field index sem compactação:', compactados[0],
+#     '\nTamanho do field index com compactação:', compactados[1],
+#     '\nTamanho do field index com Gama Code:', compactados[2])
 
 
 with open('./extraído/amazon - amazon.csv', 'r') as arqcsv:
@@ -739,21 +740,28 @@ def correlacao_spearman(r1, r2):
 
 def processamento_consulta(entrada):
     # (field_index) Marca.consulta
-    campo = entrada[0]
-    # if entrada['Marca'] != '':
-    #     campo = entrada['Marca']  # 'Marca'
-    # if entrada['Tecnologia'] != '':
-    #     tecnologia = entrada['Tecnologia']
-    # if entrada['Tela'] != '':
-    #     tela = entrada['Tela']
-    # if entrada['Polegada'] != '':
-    #     polegada = entrada['Polegada']
+    # campo = entrada[0]
+    if entrada['Marca'] != '':
+        campo = 'Marca'  # 'Marca'
+        marca = entrada['Marca']
+        pesquisa = marca
+    if entrada['Tecnologia'] != '':
+        tecnologia = entrada['Tecnologia']
+        pesquisa = tecnologia
+        campo = 'Tecnologia'
+    if entrada['Tela'] != '':
+        tela = entrada['Tela']
+        campo = 'Tela'
+        pesquisa = tela
+    if entrada['Polegada'] != '':
+        campo = 'Polegada'
+        polegada = entrada['Polegada']
+        pesquisa = polegada # ['Samsung', 'led']
     
-    pesquisa = entrada[1] # ['Samsung', 'led']
-    
-    dn, q = cosseno_tfidf(queue = pesquisa, infos=[ii], field=field_index[campo])
-    dn_limpo, q_limpo = cosseno_limpo(queue = pesquisa, infos=[ii], field=field_index[campo])
-
+    print(campo, pesquisa)
+    dn, q = cosseno_tfidf(queue = [pesquisa], infos=[ii], field=field_index[campo])
+    dn_limpo, q_limpo = cosseno_limpo(queue = [pesquisa], infos=[ii], field=field_index[campo])
+    print(dn)
     sim = []
     c = 0
     for n in dn:
@@ -763,8 +771,9 @@ def processamento_consulta(entrada):
             sim.append(( (dot(n, q) / ( norm(n) * norm(q) )), c))
         c+=1
     sim = list(filter(lambda x: isnan(x[0]) == False, sim))
-    sim.sort(key=lambda x: x[0], reverse=True)
     # print('Cosseno TF-IDF', [x[1] for x in sim])
+    # print(sim)
+    sim.sort(key=lambda x: x[0], reverse=True)
 
     # -------------------------------------------------------------------------
 
@@ -787,9 +796,14 @@ def processamento_consulta(entrada):
     for x in busca1:
         title.append(df.title[int(x)])
     busca1 = list(zip(busca1, title))
-    return correlacao_spearman(sim, sim_limpo), busca1, title
+    cs = correlacao_spearman(sim, sim_limpo)
+    # print('Correlação de Spearman', cs, 'para busca: ', entrada)
+    return cs, busca1, title
 
 # processamento_consulta(['Marca', ['samsung']])
+# processamento_consulta(['Tela', ['4k']])
+# processamento_consulta(['Tecnologia', ['led']])
+# processamento_consulta(['Marca', ['acer'], 'Tecnologia', ['led']])
 
 def comentarios():
     # sim = []
