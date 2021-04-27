@@ -9,6 +9,8 @@ from math import log
 from numpy import dot
 from numpy.linalg import norm
 from numpy import isnan
+from numpy import bool8
+from sys import getsizeof
 import pprint
 import pandas as pd
 import re
@@ -457,13 +459,13 @@ def main():
 
     # print(df.Marca.str.contains('samsung', regex=False))
 
-    def field_index_idf(termo, campo):
-        idf = []
-        for x in range(len(df[campo])):
-            times = df[campo][x].count(termo)
-            if times > 0:
-                idf.append((x, times))
-        return idf
+    # def field_index_idf(termo, campo):
+    #     idf = []
+    #     for x in range(len(df[campo])):
+    #         times = df[campo][x].count(termo)
+    #         if times > 0:
+    #             idf.append((x, times))
+    #     return idf
 
     # print(field_index_idf('lg', 'Marca'))
 
@@ -616,7 +618,6 @@ df['Tecnologia'] = df['Tecnologia'].map(lambda x: tratar_tecnologia(x))
 df['Tela'] = df['Tela'].map(lambda x: tratar_tela(x))
 # print(df.Tela.values)
 
-
 def gama_compactacao(valor):
     log2 = lambda x: log(x, 2)
     
@@ -637,16 +638,21 @@ def gama_compactacao(valor):
         l = int(log2(x))
     
         k = unario(n) + binario(b, l)
-        return array([int(x) for x in k], dtype=bool8)
+        return array([int(x) for x in k])
     
     return gama(valor)
     # print(gama(10))
 
+compactar_field = True
+compactar_gama  = True
 compactados = [0, 0, 0]
+pp = pprint.PrettyPrinter(indent=4)
+
 def comparar_compactacao(p1, p2, p3):
     compactados[0] += getsizeof(p1)
     compactados[1] += getsizeof(p2)
     compactados[2] += getsizeof(p3)
+    # print(compactados)
     return
 
 def field_index_idf(termo, campo):
@@ -667,10 +673,14 @@ def field_index_idf(termo, campo):
                 idf3[x] = (gama_compactacao(l[x-1]), idf2[x][1])
             idf2[x] = (l[x-1], idf2[x][1])
         
-        # print(idf2, idf3)
-    
+    # print(idf2, idf3)
     comparar_compactacao(idf, idf2, idf3)
+    print(termo, campo)
+    # pp.pprint(idf)
+    pp.pprint(idf2)
+    # pp.pprint(idf3)
     return idf
+
 
 field_index = dict({'Marca': dict(), 'Tecnologia': dict(), 'Tela': dict()})
 for m in df.Marca.unique():
@@ -688,6 +698,11 @@ for m in df.Tecnologia.unique():
 for m in df.Tela.unique():
     m_array = field_index_idf(m, 'Tela')
     field_index['Tela'].update(dict({m: m_array}))
+
+print('Tamanho do field index sem compactação:', compactados[0],
+    '\nTamanho do field index com compactação:', compactados[1],
+    '\nTamanho do field index com Gama Code:', compactados[2])
+
 
 with open('./extraído/amazon - amazon.csv', 'r') as arqcsv:
     linhas = reader(arqcsv)
@@ -765,10 +780,16 @@ def processamento_consulta(entrada):
     sim_limpo.sort(key=lambda x: x[0], reverse=True)
     # print('Cosseno com TF', [x[1] for x in sim_limpo])
     
-    print(sim[:40], sim_limpo[:40], sep='\n')
-    print(correlacao_spearman(sim, sim_limpo))
+    # print(sim[:40], sim_limpo[:40], sep='\n')
+    # print(correlacao_spearman(sim, sim_limpo))
+    busca1 = [str(x[1]) for x in sim[:]]
+    title = []
+    for x in busca1:
+        title.append(df.title[int(x)])
+    busca1 = list(zip(busca1, title))
+    return correlacao_spearman(sim, sim_limpo), busca1, title
 
-processamento_consulta(['Marca', ['samsung']])
+# processamento_consulta(['Marca', ['samsung']])
 
 def comentarios():
     # sim = []

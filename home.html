@@ -10,7 +10,7 @@
         <script type="text/javascript">
             
             function buscarInput() {
-                window.location.href = 'http://127.0.0.1:5000/teste?busca=' + document.getElementById('input-busca').value;
+                window.location.href = 'http://127.0.0.1:5000/teste?busca=' + document.getElementById('input-busca-marca').value + ',' + document.getElementById('input-busca-tecnologia').value + ',' + document.getElementById('input-busca-tela').value + ',' + document.getElementById('input-busca-polegada').value + ',' + document.getElementById('input-busca-entrada').value;
             };
             
             // const inputListener = document.getElementById('input-busca');
@@ -34,31 +34,31 @@
             <div>
                 <p class="titulo-busca">Marca</p>
                 <i class="fa fa-search" aria-hidden="true"></i>
-                <input type="text" id='input-busca'>
+                <input type="text" id='input-busca-marca'>
             </div>
             <div>
                 <br>
                 <p class="titulo-busca">Tipo de tela</p>
                 <i class="fa fa-search" aria-hidden="true"></i>
-                <input type="text" id='input-busca'>
+                <input type="text" id='input-busca-tecnologia'>
             </div>
             <div>
                 <br>
                 <p class="titulo-busca">Resolução</p>
                 <i class="fa fa-search" aria-hidden="true"></i>
-                <input type="text" id='input-busca'>
+                <input type="text" id='input-busca-tela'>
             </div>
             <div>
                 <br>
                 <p class="titulo-busca">Polegadas</p>
                 <i class="fa fa-search" aria-hidden="true"></i>
-                <input type="text" id='input-busca'>
+                <input type="text" id='input-busca-polegada'>
             </div>
             <div>
                 <br>
                 <p class="titulo-busca">Entradas</p>
                 <i class="fa fa-search" aria-hidden="true"></i>
-                <input type="text" id='input-busca'>
+                <input type="text" id='input-busca-entrada'>
             </div>
         </div>
         <div class="botoes">

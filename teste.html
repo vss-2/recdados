@@ -1,0 +1,24 @@
+{% block head %}
+<link rel="stylesheet" href="styles.css">
+{% endblock %}
+
+{% block body %}
+    <div class="topbar_resultados">
+        <a  href="http://127.0.0.1:5000">
+            <img class="resultados" src="RadiCS.svg"/>
+        </a>
+        <div>
+            <i class="fa fa-search" aria-hidden="true"></i>
+            <input class="resultados" type="text" id="input-busca" value={{bo}}>
+        </div>
+    </div>
+    <hr></hr>
+    <div class="resultados">
+    {% for palavra in resultado1 %}
+        <a href="">
+            <p class='links'>{{palavra[0] + '.html'}}</p>
+            <p class='resultados'>{{palavra[1]}}</p>
+        </a>
+    {% endfor %}
+    </div>
+{% endblock %}
