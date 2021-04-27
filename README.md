@@ -6,4 +6,3 @@ Projeto da dupla Lucas Vinícius (@lvjs) e Vitor Sousa (@vss2) da disciplina de 
 * Existem arquivos pré-compilados para o classificador e extras da tarefa2 em cada pasta (caso não queira utilizar, modificar alterar parâmetro "novos_dados=True" em classificador() do arquivo tarefa2.py)
 * A apresentação está no .pdf "Entrega 1 - Recuperação de Dados.pdf"
 
-* Os dados referentes a Conceito enade foram generalizados e não devem ser considerados. 
