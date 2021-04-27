@@ -138,6 +138,54 @@ def cosScore(queue = [str], K = int, index = [indiceInvertido]):
 
     return scores[:K]
 
+def cosseno_limpo(queue = [str], K = int, index = [indiceInvertido]):
+    scores = [0] * (len(index[0].termos)+1)
+    scores2 = []
+    for r in range(len(index[0].termos)+1):
+        scores2.append([0]*len(queue))
+    length = index[0].termos
+    # print(index[0].vocabulario)
+    
+    peso_query = []
+
+    for q in queue:
+        # Tratar termo
+        # Calcular importância do termo na query
+        wtq = queue.count(q)/len(queue)
+
+        # Buscar a posting list de cada documento
+        busca = index[0].vocabulario[q]
+        # print(busca)
+        peso_query.append( (1+log(queue.count(q))) * log(len(index[0].paginas)/len(busca)))
+        for b in busca:
+            # print(b)
+            # 'ultrawide': [[218, 1], [226, 1]]
+            # print(scores[b[0]])
+            scores[b[0]] += b[1] * wtq
+            # print(b[1] * log(len(index[0].paginas)/b[1], 2) * wtq)
+            scores2[b[0]][queue.index(q)] = ( b[1] * wtq ) / length[b[0]-1]
+
+        # print(scores2)
+
+        for s in range(len(scores)-1):
+            scores[s] = scores[s]/length[s]
+
+        # print(scores)
+
+    for s in range(len(scores)-1):
+        title = index[0].paginas[s].find('.html') + 5
+        title = index[0].paginas[s][title:]
+        scores[s] = (scores[s], s, title.strip())
+        # scores[s] = (scores[s], s, index[0].paginas[s])
+
+    # scores.sort(key= lambda x: x[0], reverse=True)
+    # for arq in scores[:K]:
+        # print(arq[0])
+        # print('<<<-', index[0].paginas[arq[1]-1], '->>>')
+    # print(scores2)
+
+    return scores2, peso_query
+
 def cosseno_tfidf(queue = [str], K = int, index = [indiceInvertido]):
     scores = [0] * (len(index[0].termos)+1)
     scores2 = []
@@ -163,7 +211,7 @@ def cosseno_tfidf(queue = [str], K = int, index = [indiceInvertido]):
             # print(scores[b[0]])
             scores[b[0]] += b[1] * log(len(index[0].paginas)/b[1], 2) * wtq
             # print(b[1] * log(len(index[0].paginas)/b[1], 2) * wtq)
-            scores2[b[0]][queue.index(q)] = ((1+ log(b[1], 2) * log(len(index[0].paginas)/len(b), 2) * wtq))
+            scores2[b[0]][queue.index(q)] = ((1+ log(b[1], 2) * log(len(index[0].paginas)/len(b), 2) * wtq))/length[b[0]-1]
 
         # print(scores2)
 
@@ -182,8 +230,8 @@ def cosseno_tfidf(queue = [str], K = int, index = [indiceInvertido]):
     # for arq in scores[:K]:
         # print(arq[0])
         # print('<<<-', index[0].paginas[arq[1]-1], '->>>')
-
     # print(scores2)
+
     return scores2, peso_query
 
 
@@ -460,12 +508,40 @@ def main():
 
     # cs = cosScore(queue = ['tcl'], K = 10, index = [ii])
     # dn, q = 
-    um, dois = cosseno_tfidf(queue = ['tcl', 'samsung'], K = 10, index = [ii])
-    print(dois)
-    # sim = []
+    dn, q = cosseno_tfidf(queue = ['tcl', 'samsung'], K = 10, index = [ii])
+    
+    sim = []
 
-    # for n in dn:
-    #     sim.append(dot(n, q) / (norm(n) * norm(q)))
+    c = 0
+    for n in dn:
+        if n == [0,0]: sim.append((0, c))
+        else: 
+            # print(n, q)
+            sim.append(( (dot(n, q) / ( norm(n) * norm(q) )), c))
+        c+=1
+    
+    sim.sort(key=lambda x: x[0], reverse=True)
+    # print([x[1] for x in sim_limpo])
+    # print('Cosseno TF-IDF', [x[1] for x in sim])
+
+    # -------------------------------------------------------------------------
+    
+    dn_limpo, q_limpo = cosseno_limpo(queue = ['tcl', 'lcd'], K = 10, index = [ii])
+    
+    sim_limpo = []
+
+    c = 0
+    for n in dn_limpo:
+        if n == [0,0]: sim_limpo.append((0, c))
+        else: 
+            # print(n, q)
+            sim_limpo.append(( (dot(n, q_limpo) / ( norm(n) * norm(q_limpo) )), c))
+        c+=1
+
+    sim_limpo.sort(key=lambda x: x[0], reverse=True)
+    # print('Cosseno com TF', [x[1] for x in sim_limpo])
+
+    print(correlacao_spearman(sim, sim_limpo))
 
     # pp.pprint(cs)
 
