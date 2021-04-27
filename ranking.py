@@ -139,10 +139,15 @@ def cosScore(queue = [str], K = int, index = [indiceInvertido]):
     return scores[:K]
 
 def cosseno_tfidf(queue = [str], K = int, index = [indiceInvertido]):
-    scores = [0] * len(index[0].termos)
+    scores = [0] * (len(index[0].termos)+1)
+    scores2 = []
+    for r in range(len(index[0].termos)+1):
+        scores2.append([0]*len(queue))
     length = index[0].termos
     # print(index[0].vocabulario)
     
+    peso_query = []
+
     for q in queue:
         # Tratar termo
         # Calcular importância do termo na query
@@ -150,27 +155,36 @@ def cosseno_tfidf(queue = [str], K = int, index = [indiceInvertido]):
 
         # Buscar a posting list de cada documento
         busca = index[0].vocabulario[q]
+        # print(busca)
+        peso_query.append( (1+log(queue.count(q))) * log(len(index[0].paginas)/len(busca)))
         for b in busca:
+            # print(b)
             # 'ultrawide': [[218, 1], [226, 1]]
+            # print(scores[b[0]])
             scores[b[0]] += b[1] * log(len(index[0].paginas)/b[1], 2) * wtq
+            # print(b[1] * log(len(index[0].paginas)/b[1], 2) * wtq)
+            scores2[b[0]][queue.index(q)] = ((1+ log(b[1], 2) * log(len(index[0].paginas)/len(b), 2) * wtq))
 
-        for s in range(len(scores)):
+        # print(scores2)
+
+        for s in range(len(scores)-1):
             scores[s] = scores[s]/length[s]
 
         # print(scores)
 
-    for s in range(len(scores)):
+    for s in range(len(scores)-1):
         title = index[0].paginas[s].find('.html') + 5
         title = index[0].paginas[s][title:]
         scores[s] = (scores[s], s, title.strip())
         # scores[s] = (scores[s], s, index[0].paginas[s])
 
-    scores.sort(key= lambda x: x[0], reverse=True)
+    # scores.sort(key= lambda x: x[0], reverse=True)
     # for arq in scores[:K]:
         # print(arq[0])
         # print('<<<-', index[0].paginas[arq[1]-1], '->>>')
 
-    return scores[:K]
+    # print(scores2)
+    return scores2, peso_query
 
 
 def testar():
@@ -333,8 +347,9 @@ def main():
             # ambos serão uma lista, salvei conjunto só pra uso futuro (mais rápido)
 
             # token de feito a partir de todos os documentos
+            
+            # print(list(tokens))
             tokens = map(lambda x: x[0], indice[0].aparicoes)
-
             temp_doc, temp_bus = [], []
 
             for t in tokens:
@@ -351,8 +366,9 @@ def main():
 
         df['Resultado Cosseno'] = ['Resultado Cosseno'] + resultado_semelhanca
         return t_doc, t_bus
-    
-    r1, r2 = espaco_vetor([ii], busca=['samsung', 'led'], df=df)
+
+    # r1, r2 = espaco_vetor([ii], busca=['samsung', 'led'], df=df)
+    # print(df['Resultado Cosseno'])
 
     def correlacao_spearman(r1, r2):
         quadrado = []
@@ -372,9 +388,10 @@ def main():
 
     resultados_spearman = []
     # print(r1)
+
     # for r in range(len(r1)):
-        # resultados_spearman.append(correlacao_spearman(r1[r], r2[r]))
-    # print(resultados_spearman)
+    #     resultados_spearman.append(correlacao_spearman(r1[r], r2[r]))
+    # print(resultados_spearman[:10])
 
     pp = pprint.PrettyPrinter(indent=4)
 
@@ -407,8 +424,8 @@ def main():
     for m in df.Tela.unique():
         m_array = field_index_idf(m, 'Tela')
         field_index['Tela'].append(dict({m: m_array}))
-    
-    pp.pprint(field_index['Tela'])
+
+    # pp.pprint(field_index['Tela'])
     
     # print(field_index)
     # pp.pprint(field_index)
@@ -441,8 +458,15 @@ def main():
             # if z != 0.0:
                 # print('Zone Scoring de ', b, ': ', z, sep='')
 
-    cs = cosScore(queue = ['tcl'], K = 10, index = [ii])
-    cs = cosseno_tfidf(queue = ['tcl'], K = 10, index = [ii])
+    # cs = cosScore(queue = ['tcl'], K = 10, index = [ii])
+    # dn, q = 
+    um, dois = cosseno_tfidf(queue = ['tcl', 'samsung'], K = 10, index = [ii])
+    print(dois)
+    # sim = []
+
+    # for n in dn:
+    #     sim.append(dot(n, q) / (norm(n) * norm(q)))
+
     # pp.pprint(cs)
 
 main()
